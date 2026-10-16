@@ -22,22 +22,40 @@ export const Footer = ({ setCurrentView }) => {
         >
           {/* Brand Info */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
-              <div className="nav-brand-logo" style={{ width: '34px', height: '34px' }}>
-                <BookOpen size={18} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.2rem' }}>
+              <div
+                className="nav-brand-logo"
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, #d97706, #92400e)',
+                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                  boxShadow: '0 4px 12px rgba(217, 119, 6, 0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <BookOpen size={20} color="#fff" />
               </div>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800 }}>
-                LitHaven
-              </span>
+              <div>
+                <span className="font-serif-literary" style={{ fontSize: '1.55rem', fontWeight: 700, letterSpacing: '0.02em', color: '#fff', display: 'block', lineHeight: 1.1 }}>
+                  LitHaven
+                </span>
+                <span style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--accent-gold)', fontWeight: 600 }}>
+                  Archival Academic Exchange
+                </span>
+              </div>
             </div>
-            <p style={{ fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '1.2rem' }}>
-              The verified peer-to-peer campus book exchange and academic study sanctuary. Saving students thousands on textbooks while creating sustainable, circular campus economies.
+            <p style={{ fontSize: '0.9rem', lineHeight: 1.65, marginBottom: '1.3rem', color: 'var(--text-secondary)' }}>
+              The verified collegiate peer-to-peer exchange and academic compendium sanctuary. Eliminating textbook inflation while anchoring sustainable circular scholarship across university communities.
             </p>
             <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-              <span className="badge badge-good" style={{ textTransform: 'none' }}>
+              <span className="badge badge-good" style={{ textTransform: 'none', background: 'rgba(217, 119, 6, 0.1)', color: 'var(--accent-gold)', borderColor: 'rgba(217, 119, 6, 0.25)' }}>
                 <ShieldCheck size={13} /> 100% Peer Verified
               </span>
-              <span className="badge badge-like-new" style={{ textTransform: 'none' }}>
+              <span className="badge badge-like-new" style={{ textTransform: 'none', background: 'rgba(16, 185, 129, 0.1)', color: '#34d399', borderColor: 'rgba(16, 185, 129, 0.25)' }}>
                 <Zap size={13} /> Zero Commission
               </span>
             </div>

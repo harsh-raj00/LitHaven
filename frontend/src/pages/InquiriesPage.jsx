@@ -12,7 +12,9 @@ import {
   DollarSign,
   User,
   BookOpen,
-  Sparkles
+  Sparkles,
+  ShieldCheck,
+  CheckCheck
 } from 'lucide-react';
 
 export const InquiriesPage = () => {
@@ -51,13 +53,13 @@ export const InquiriesPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!messageText.trim() || !selectedInquiry) return;
+  const handleSendMessage = async (textToSend) => {
+    const text = textToSend || messageText.trim();
+    if (!text || !selectedInquiry) return;
 
     setSending(true);
     try {
-      const data = await api.inquiries.sendMessage(selectedInquiry._id, messageText.trim());
+      const data = await api.inquiries.sendMessage(selectedInquiry._id, text);
       if (data.success) {
         setMessageText('');
         setSelectedInquiry(data.inquiry);
@@ -99,43 +101,69 @@ export const InquiriesPage = () => {
     }
   };
 
+  const quickPresets = [
+    'Can we meet at the Library Quad Atrium at 3:00 PM?',
+    'I have cash ready. Can we finalize today?',
+    'Are the page annotations minimal as described?',
+    'I accept your proposed handover window!'
+  ];
+
   return (
     <div style={{ padding: '2.5rem 0 4rem' }}>
       <div className="content-wrapper">
-        <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '2.2rem', marginBottom: '0.4rem' }}>
-            Book Handover Offers & Chats
+        <div style={{ marginBottom: '2.2rem' }}>
+          <div className="hero-badge-tag" style={{ marginBottom: '0.6rem' }}>
+            <MessageSquare size={14} color="var(--accent-gold)" /> PEER NEGOTIATION & QUAD HANDOVER
+          </div>
+          <h1 className="font-display" style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>
+            Campus Offers & Handover Salon
           </h1>
-          <p>Coordinate peer-to-peer campus meetups and negotiate purchase offers directly.</p>
+          <p className="font-serif-literary" style={{ fontSize: '1.25rem', maxWidth: '720px' }}>
+            Coordinate verified university quad handovers, negotiate fair student pricing, and finalize
+            exchanges safely without third-party platform markups.
+          </p>
         </div>
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '5rem 0' }}>
-            <p>Loading your conversations...</p>
+            <div
+              style={{
+                display: 'inline-block',
+                width: '40px',
+                height: '40px',
+                border: '3px solid rgba(124, 58, 237, 0.2)',
+                borderTopColor: 'var(--primary)',
+                borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite'
+              }}
+            />
+            <p style={{ marginTop: '1rem', color: 'var(--text-secondary)' }}>
+              Retrieving active negotiations...
+            </p>
           </div>
         ) : inquiries.length === 0 ? (
-          <div className="glass-panel" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-            <MessageSquare size={48} color="var(--text-muted)" style={{ margin: '0 auto 1rem' }} />
-            <h3>No Active Offers or Conversations Yet</h3>
-            <p style={{ maxWidth: '440px', margin: '0.6rem auto 1.4rem' }}>
-              When you make an offer on a book in the Codex Exchange or a fellow scholar makes an offer
-              on your listing, your chat threads will appear here!
+          <div className="glass-panel" style={{ textAlign: 'center', padding: '4.5rem 2rem' }}>
+            <MessageSquare size={48} color="var(--accent-gold)" style={{ margin: '0 auto 1.2rem' }} />
+            <h3 className="font-display">No Active Negotiations Recorded</h3>
+            <p style={{ maxWidth: '440px', margin: '0.6rem auto 1.5rem', color: 'var(--text-secondary)' }}>
+              When you propose an offer on a volume in The Codex Exchange or a fellow scholar inquires about
+              your monograph, your active thread will materialize here.
             </p>
           </div>
         ) : (
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'minmax(280px, 1fr) minmax(360px, 2fr)',
-              gap: '1.5rem',
-              minHeight: '620px'
+              gridTemplateColumns: 'minmax(300px, 1fr) minmax(400px, 2fr)',
+              gap: '1.8rem',
+              minHeight: '640px'
             }}
             className="inquiries-layout"
           >
             {/* Left: Inquiries List */}
             <div
               className="glass-panel"
-              style={{ padding: '1rem', overflowY: 'auto', maxHeight: '720px' }}
+              style={{ padding: '1.2rem', overflowY: 'auto', maxHeight: '740px', borderRadius: 'var(--radius-lg)' }}
             >
               <div
                 style={{
@@ -149,11 +177,13 @@ export const InquiriesPage = () => {
                   alignItems: 'center'
                 }}
               >
-                <span>Active Threads ({inquiries.length})</span>
-                <span style={{ fontSize: '0.72rem', color: 'var(--accent-gold)' }}>Live Sync</span>
+                <span>Active Channels ({inquiries.length})</span>
+                <span style={{ fontSize: '0.74rem', color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <span className="pulse-dot" style={{ width: '6px', height: '6px' }}></span> Live Synchronized
+                </span>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
                 {inquiries.map((inq) => {
                   const isSelected = selectedInquiry?._id === inq._id;
                   const otherParty =
@@ -164,16 +194,16 @@ export const InquiriesPage = () => {
                     <div
                       key={inq._id}
                       style={{
-                        padding: '0.85rem',
+                        padding: '1rem',
                         borderRadius: '12px',
                         background: isSelected
-                          ? 'rgba(99, 102, 241, 0.16)'
-                          : 'rgba(255, 255, 255, 0.03)',
+                          ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.16) 0%, rgba(212, 175, 55, 0.08) 100%)'
+                          : 'rgba(255, 255, 255, 0.02)',
                         border: isSelected
-                          ? '1px solid var(--primary)'
+                          ? '1px solid var(--border-gold)'
                           : '1px solid var(--border-subtle)',
                         cursor: 'pointer',
-                        transition: 'all 0.15s'
+                        transition: 'all 0.18s ease'
                       }}
                       onClick={() => setSelectedInquiry(inq)}
                     >
@@ -182,30 +212,39 @@ export const InquiriesPage = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          marginBottom: '0.4rem'
+                          marginBottom: '0.5rem'
                         }}
                       >
-                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary-light)' }}>
-                          {isUserSeller ? 'INCOMING OFFER' : 'OUTGOING OFFER'}
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            fontWeight: 800,
+                            letterSpacing: '0.06em',
+                            color: isUserSeller ? 'var(--accent-gold)' : 'var(--primary-light)'
+                          }}
+                        >
+                          {isUserSeller ? 'INCOMING OFFER' : 'OUTGOING PROPOSAL'}
                         </span>
                         {getStatusBadge(inq.status)}
                       </div>
 
-                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
                         <img
                           src={inq.book?.coverImage || '/covers/cover_placeholder.jpg'}
                           alt={inq.book?.title}
                           style={{
                             width: '42px',
-                            height: '52px',
+                            height: '56px',
                             borderRadius: '6px',
-                            objectFit: 'cover'
+                            objectFit: 'cover',
+                            border: '1px solid var(--border-subtle)'
                           }}
                         />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div
+                            className="font-serif-literary"
                             style={{
-                              fontSize: '0.92rem',
+                              fontSize: '0.98rem',
                               fontWeight: 700,
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
@@ -214,12 +253,12 @@ export const InquiriesPage = () => {
                           >
                             {inq.book?.title}
                           </div>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            with {otherParty?.name} • ${inq.offeredPrice}
+                          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                            with {otherParty?.name} • <strong className="font-mono" style={{ color: 'var(--text-primary)' }}>${inq.offeredPrice}</strong>
                           </div>
                           <div
                             style={{
-                              fontSize: '0.75rem',
+                              fontSize: '0.76rem',
                               color: 'var(--text-muted)',
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
@@ -227,7 +266,7 @@ export const InquiriesPage = () => {
                               marginTop: '0.2rem'
                             }}
                           >
-                            {inq.messages?.[inq.messages.length - 1]?.text || 'No messages yet'}
+                            {inq.messages?.[inq.messages.length - 1]?.text || 'Negotiation opened'}
                           </div>
                         </div>
                       </div>
@@ -237,7 +276,7 @@ export const InquiriesPage = () => {
               </div>
             </div>
 
-            {/* Right: Active Conversation Thread */}
+            {/* Right: Active Handover Negotiation Channel */}
             {selectedInquiry ? (
               <div
                 className="glass-panel"
@@ -245,15 +284,17 @@ export const InquiriesPage = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   overflow: 'hidden',
-                  height: '720px'
+                  height: '740px',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--border-gold)'
                 }}
               >
-                {/* Thread Header */}
+                {/* Handover Agreement Card Header */}
                 <div
                   style={{
                     padding: '1.2rem 1.6rem',
                     borderBottom: '1px solid var(--border-subtle)',
-                    background: 'rgba(255, 255, 255, 0.02)',
+                    background: 'radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.08) 0%, rgba(10, 14, 24, 0.85) 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -261,34 +302,35 @@ export const InquiriesPage = () => {
                     gap: '1rem'
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <img
                       src={selectedInquiry.book?.coverImage || '/covers/cover_placeholder.jpg'}
                       alt={selectedInquiry.book?.title}
-                      style={{ width: '48px', height: '60px', borderRadius: '6px', objectFit: 'cover' }}
+                      style={{ width: '48px', height: '64px', borderRadius: '6px', objectFit: 'cover', border: '1px solid var(--border-gold)' }}
                     />
                     <div>
-                      <h3 style={{ fontSize: '1.15rem', marginBottom: '0.2rem' }}>
+                      <h3 className="font-serif-literary" style={{ fontSize: '1.25rem', marginBottom: '0.2rem' }}>
                         {selectedInquiry.book?.title}
                       </h3>
                       <div
                         style={{
-                          fontSize: '0.82rem',
+                          fontSize: '0.84rem',
                           color: 'var(--text-secondary)',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '0.8rem'
+                          gap: '0.8rem',
+                          flexWrap: 'wrap'
                         }}
                       >
                         <span>
-                          Offer Price:{' '}
-                          <strong style={{ color: 'var(--text-primary)' }}>
+                          Proposed Price:{' '}
+                          <strong className="font-mono" style={{ color: 'var(--accent-gold)', fontSize: '0.95rem' }}>
                             ${selectedInquiry.offeredPrice}
                           </strong>
                         </span>
                         <span>•</span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                          <MapPin size={13} color="var(--primary-light)" />
+                          <MapPin size={13} color="var(--accent-gold)" />
                           {selectedInquiry.proposedLocation}
                         </span>
                       </div>
@@ -296,7 +338,7 @@ export const InquiriesPage = () => {
                   </div>
 
                   {/* Seller Status Actions */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                     {selectedInquiry.seller?._id === user?._id &&
                       selectedInquiry.status === 'pending' && (
                         <>
@@ -304,6 +346,7 @@ export const InquiriesPage = () => {
                             type="button"
                             className="btn btn-primary btn-sm"
                             onClick={() => handleStatusChange('accepted')}
+                            style={{ padding: '0.45rem 0.95rem', borderRadius: '8px' }}
                           >
                             <CheckCircle size={14} /> Accept Offer
                           </button>
@@ -311,6 +354,7 @@ export const InquiriesPage = () => {
                             type="button"
                             className="btn btn-secondary btn-sm"
                             onClick={() => handleStatusChange('declined')}
+                            style={{ padding: '0.45rem 0.95rem', borderRadius: '8px' }}
                           >
                             <XCircle size={14} /> Decline
                           </button>
@@ -322,6 +366,7 @@ export const InquiriesPage = () => {
                         type="button"
                         className="btn btn-accent btn-sm"
                         onClick={() => handleStatusChange('completed')}
+                        style={{ padding: '0.45rem 0.95rem', borderRadius: '8px' }}
                       >
                         <CheckCircle size={14} /> Mark Handover Completed
                       </button>
@@ -336,7 +381,7 @@ export const InquiriesPage = () => {
                   style={{
                     flex: 1,
                     overflowY: 'auto',
-                    padding: '1.5rem',
+                    padding: '1.6rem',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '1rem'
@@ -352,7 +397,7 @@ export const InquiriesPage = () => {
                         key={i}
                         style={{
                           display: 'flex',
-                          gap: '0.65rem',
+                          gap: '0.75rem',
                           alignSelf: isMe ? 'flex-end' : 'flex-start',
                           maxWidth: '75%',
                           flexDirection: isMe ? 'row-reverse' : 'row'
@@ -369,31 +414,33 @@ export const InquiriesPage = () => {
                             height: '32px',
                             borderRadius: '50%',
                             objectFit: 'cover',
-                            marginTop: '4px'
+                            marginTop: '4px',
+                            border: '1px solid var(--border-gold)'
                           }}
                         />
                         <div>
                           <div
                             style={{
-                              fontSize: '0.74rem',
+                              fontSize: '0.75rem',
                               color: 'var(--text-muted)',
-                              marginBottom: '0.2rem',
+                              marginBottom: '0.25rem',
                               textAlign: isMe ? 'right' : 'left'
                             }}
                           >
-                            {isMe ? 'You' : senderObj?.name}
+                            {isMe ? 'You (Verified)' : senderObj?.name}
                           </div>
                           <div
                             style={{
-                              background: isMe ? 'var(--primary)' : 'rgba(255, 255, 255, 0.08)',
+                              background: isMe ? 'linear-gradient(135deg, var(--primary) 0%, #5b21b6 100%)' : 'rgba(255, 255, 255, 0.06)',
                               color: '#ffffff',
-                              padding: '0.75rem 1rem',
+                              padding: '0.8rem 1.1rem',
                               borderRadius: isMe
                                 ? '16px 16px 4px 16px'
                                 : '16px 16px 16px 4px',
-                              fontSize: '0.9rem',
-                              lineHeight: 1.45,
-                              boxShadow: 'var(--shadow-sm)'
+                              fontSize: '0.92rem',
+                              lineHeight: 1.5,
+                              boxShadow: 'var(--shadow-sm)',
+                              border: isMe ? 'none' : '1px solid var(--border-subtle)'
                             }}
                           >
                             {msg.text}
@@ -404,9 +451,31 @@ export const InquiriesPage = () => {
                   })}
                 </div>
 
+                {/* Quick Negotiation Preset Chips */}
+                <div style={{ padding: '0.6rem 1.4rem', borderTop: '1px solid var(--border-subtle)', background: 'rgba(0,0,0,0.2)' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.4rem', letterSpacing: '0.04em' }}>
+                    QUICK HANDOVER PHRASES:
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                    {quickPresets.map((preset, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        className="quick-chip"
+                        onClick={() => handleSendMessage(preset)}
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Send Message Form */}
                 <form
-                  onSubmit={handleSendMessage}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }}
                   style={{
                     padding: '1rem 1.4rem',
                     borderTop: '1px solid var(--border-subtle)',
@@ -419,9 +488,9 @@ export const InquiriesPage = () => {
                   <input
                     type="text"
                     required
-                    placeholder="Type message to agree on campus meetup time or price..."
+                    placeholder="Type message to agree on campus quad meetup time or price..."
                     className="form-input"
-                    style={{ borderRadius: '999px' }}
+                    style={{ borderRadius: '999px', fontSize: '0.9rem' }}
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                   />
@@ -429,7 +498,7 @@ export const InquiriesPage = () => {
                     type="submit"
                     className="btn btn-primary"
                     disabled={sending}
-                    style={{ borderRadius: '999px', padding: '0.75rem 1.2rem' }}
+                    style={{ borderRadius: '999px', padding: '0.75rem 1.3rem' }}
                   >
                     {sending ? 'Sending...' : <Send size={16} />}
                   </button>

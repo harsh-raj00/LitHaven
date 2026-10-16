@@ -53,89 +53,100 @@ export const AuthModal = () => {
           <X size={18} />
         </button>
 
-        <div style={{ textAlign: 'center', marginBottom: '1.6rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '1.8rem' }}>
           <div
             style={{
               display: 'inline-flex',
-              padding: '10px',
-              borderRadius: '16px',
-              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(245, 158, 11, 0.15))',
-              border: '1px solid rgba(99, 102, 241, 0.3)',
-              marginBottom: '0.8rem'
+              padding: '12px',
+              borderRadius: '20px',
+              background: 'radial-gradient(circle at 50% 50%, rgba(217, 119, 6, 0.2), rgba(15, 23, 42, 0.6))',
+              border: '1px solid rgba(217, 119, 6, 0.35)',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+              marginBottom: '1rem'
             }}
           >
-            <BookOpen size={28} color="#818cf8" />
+            <BookOpen size={26} color="var(--accent-gold)" />
           </div>
-          <h2 style={{ fontSize: '1.6rem', marginBottom: '0.3rem' }}>
-            {tab === 'login' ? 'Welcome Back to LitHaven' : 'Join the Campus Network'}
+          <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'var(--accent-gold)', fontWeight: 700, marginBottom: '0.3rem' }}>
+            ACADEMIC CONSORTIUM PORTAL
+          </div>
+          <h2 className="font-serif-literary" style={{ fontSize: '2rem', marginBottom: '0.4rem', fontWeight: 600, letterSpacing: '-0.01em' }}>
+            {tab === 'login' ? 'Scholar Authentication' : 'Establish Academic Identity'}
           </h2>
-          <p style={{ fontSize: '0.88rem' }}>
+          <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', maxWidth: '380px', margin: '0 auto' }}>
             {tab === 'login'
-              ? 'Access your listings, saved books, and exchange offers'
-              : 'Buy, sell, and exchange books with peers across top universities'}
+              ? 'Access your collegiate registry, active covenants, and reserved folios.'
+              : 'Join a cross-university guild of verified scholars exchanging knowledge.'}
           </p>
         </div>
 
         {/* Demo 1-Click Persona Bar */}
         <div
           style={{
-            background: 'rgba(99, 102, 241, 0.08)',
-            border: '1px solid rgba(99, 102, 241, 0.22)',
-            borderRadius: '14px',
-            padding: '1rem',
-            marginBottom: '1.4rem'
+            background: 'linear-gradient(145deg, rgba(217, 119, 6, 0.08), rgba(15, 23, 42, 0.6))',
+            border: '1px solid rgba(217, 119, 6, 0.22)',
+            borderRadius: '16px',
+            padding: '1.1rem',
+            marginBottom: '1.6rem',
+            position: 'relative'
           }}
         >
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.4rem',
-              fontSize: '0.78rem',
+              justifyContent: 'space-between',
+              fontSize: '0.74rem',
               fontWeight: 700,
               textTransform: 'uppercase',
-              color: 'var(--primary-light)',
-              marginBottom: '0.6rem'
+              letterSpacing: '0.1em',
+              color: 'var(--accent-gold)',
+              marginBottom: '0.75rem'
             }}
           >
-            <Sparkles size={14} /> Instant 1-Click Demo Login
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Sparkles size={13} /> Immediate Fellowship Pass
+            </span>
+            <span style={{ fontSize: '0.68rem', opacity: 0.8, textTransform: 'none', color: 'var(--text-muted)' }}>
+              1-Click Verification
+            </span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
             <button
               type="button"
               className="btn btn-secondary btn-sm"
               disabled={loading}
               onClick={() => handleDemo('engineering')}
-              style={{ fontSize: '0.78rem', padding: '0.45rem' }}
+              style={{ fontSize: '0.78rem', padding: '0.55rem 0.6rem', justifyContent: 'flex-start', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
-              👩‍💻 Aanya (CS/Eng)
+              👩‍💻 <span><strong>Aanya</strong> <span style={{ opacity: 0.65, fontSize: '0.72rem' }}>(CS/Eng)</span></span>
             </button>
             <button
               type="button"
               className="btn btn-secondary btn-sm"
               disabled={loading}
               onClick={() => handleDemo('medical')}
-              style={{ fontSize: '0.78rem', padding: '0.45rem' }}
+              style={{ fontSize: '0.78rem', padding: '0.55rem 0.6rem', justifyContent: 'flex-start', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
-              🩺 Dr. Marcus (Med)
+              🩺 <span><strong>Dr. Vance</strong> <span style={{ opacity: 0.65, fontSize: '0.72rem' }}>(Med)</span></span>
             </button>
             <button
               type="button"
               className="btn btn-secondary btn-sm"
               disabled={loading}
               onClick={() => handleDemo('commerce')}
-              style={{ fontSize: '0.78rem', padding: '0.45rem' }}
+              style={{ fontSize: '0.78rem', padding: '0.55rem 0.6rem', justifyContent: 'flex-start', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
-              📊 Sophia (Finance)
+              📊 <span><strong>Sophia</strong> <span style={{ opacity: 0.65, fontSize: '0.72rem' }}>(Finance)</span></span>
             </button>
             <button
               type="button"
               className="btn btn-secondary btn-sm"
               disabled={loading}
               onClick={() => handleDemo('hardware')}
-              style={{ fontSize: '0.78rem', padding: '0.45rem' }}
+              style={{ fontSize: '0.78rem', padding: '0.55rem 0.6rem', justifyContent: 'flex-start', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
             >
-              ⚡ Rohan (BITS/Math)
+              ⚡ <span><strong>Rohan</strong> <span style={{ opacity: 0.65, fontSize: '0.72rem' }}>(Math/BITS)</span></span>
             </button>
           </div>
         </div>

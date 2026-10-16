@@ -58,9 +58,24 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
       : null;
 
   return (
-    <div className="book-card" onClick={() => onSelect(book)}>
-      {/* Cover Image Wrapper */}
+    <div className="book-card" onClick={() => onSelect(book)} role="button" tabIndex={0}>
+      {/* Cover Image Wrapper with 3D Spine Lighting */}
       <div className="book-card-image-wrap">
+        {/* Physical Hardcover Spine Overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            bottom: 0,
+            width: '18px',
+            background: 'linear-gradient(90deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 30%, transparent 100%)',
+            borderRight: '1px solid rgba(0, 0, 0, 0.25)',
+            zIndex: 3,
+            pointerEvents: 'none'
+          }}
+        />
+
         <img
           src={
             imgError || !book.coverImage
@@ -74,11 +89,34 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
         />
 
         {/* Condition Badge Overlay */}
-        <div style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 2 }}>
+        <div style={{ position: 'absolute', top: '12px', left: '16px', zIndex: 4 }}>
           <span className={`badge ${getConditionBadgeClass(book.condition)}`}>
             {book.condition}
           </span>
         </div>
+
+        {/* Course Code Tag if present */}
+        {book.courseCode && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '12px',
+              right: '48px',
+              zIndex: 4,
+              background: 'rgba(10, 14, 24, 0.85)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid var(--border-gold)',
+              color: 'var(--text-gold)',
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              padding: '0.2rem 0.5rem',
+              borderRadius: '6px',
+              fontFamily: 'var(--font-mono)'
+            }}
+          >
+            {book.courseCode}
+          </div>
+        )}
 
         {/* Discount Tag */}
         {discountPercent && discountPercent > 0 && (
@@ -86,18 +124,19 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
             style={{
               position: 'absolute',
               bottom: '12px',
-              left: '12px',
-              zIndex: 2,
+              left: '16px',
+              zIndex: 4,
               background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               color: '#ffffff',
               fontSize: '0.72rem',
               fontWeight: 800,
-              padding: '0.2rem 0.55rem',
+              padding: '0.22rem 0.6rem',
               borderRadius: '999px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              fontFamily: 'var(--font-mono)'
             }}
           >
-            {discountPercent}% OFF
+            SAVE {discountPercent}%
           </div>
         )}
 
@@ -106,6 +145,7 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
           className={`book-card-wishlist-btn ${wishlisted ? 'active' : ''}`}
           onClick={handleWishlistToggle}
           title={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          aria-label="Wishlist"
         >
           <Heart size={16} fill={wishlisted ? 'currentColor' : 'none'} />
         </button>
@@ -113,8 +153,10 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
 
       {/* Body Info */}
       <div className="book-card-body">
-        <div className="book-card-category">{book.category}</div>
-        <h3 className="book-card-title" title={book.title}>
+        <div className="book-card-category" style={{ letterSpacing: '0.08em' }}>
+          {book.category}
+        </div>
+        <h3 className="book-card-title font-serif-literary" title={book.title} style={{ fontSize: '1.18rem', lineHeight: '1.35' }}>
           {book.title}
         </h3>
         <p className="book-card-author">by {book.author}</p>
@@ -130,31 +172,31 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
             marginBottom: '0.8rem'
           }}
         >
-          <MapPin size={13} color="var(--primary-light)" />
+          <MapPin size={13} color="var(--accent-gold)" />
           <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {book.owner?.college || 'University Campus'}
+            {book.campusMeetingSpot || book.owner?.college || 'Campus Quad'}
           </span>
         </div>
 
         {/* Price & Action Footer */}
         <div className="book-card-footer">
           <div className="book-price-box">
-            <span className="book-price-current">${book.price}</span>
+            <span className="book-price-current font-mono">${book.price}</span>
             {book.originalPrice > book.price && (
-              <span className="book-price-original">${book.originalPrice}</span>
+              <span className="book-price-original font-mono">${book.originalPrice}</span>
             )}
           </div>
 
           <button
             type="button"
             className="btn btn-secondary btn-sm"
-            style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem' }}
+            style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem', borderRadius: '8px' }}
             onClick={(e) => {
               e.stopPropagation();
               onSelect(book);
             }}
           >
-            Details <ArrowUpRight size={14} />
+            Inspect <ArrowUpRight size={14} />
           </button>
         </div>
       </div>

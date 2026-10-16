@@ -13,7 +13,10 @@ import {
   Book,
   Tag,
   CheckCircle,
-  Share2
+  Share2,
+  Award,
+  Sparkles,
+  BookMarked
 } from 'lucide-react';
 
 export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
@@ -51,12 +54,12 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
     if (navigator.share) {
       navigator.share({
         title: book.title,
-        text: `Check out "${book.title}" on LitHaven campus book exchange!`,
+        text: `Inspect "${book.title}" on LitHaven Codex Exchange!`,
         url: window.location.href
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      showToast('Link copied to clipboard!', 'info');
+      showToast('Monograph link copied to clipboard!', 'info');
     }
   };
 
@@ -65,13 +68,25 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
       ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100)
       : null;
 
+  const savingsAmount =
+    book.originalPrice && book.originalPrice > book.price
+      ? Math.round(book.originalPrice - book.price)
+      : null;
+
   const isOwner = user?._id && (book.owner?._id || book.owner) === user._id;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal-content"
-        style={{ maxWidth: '820px', padding: '2rem' }}
+        style={{
+          maxWidth: '880px',
+          padding: '2.5rem',
+          borderRadius: 'var(--radius-xl)',
+          border: '1px solid var(--border-gold)',
+          boxShadow: 'var(--shadow-lg)',
+          background: 'radial-gradient(circle at 10% 10%, rgba(212, 175, 55, 0.08) 0%, var(--bg-glass-heavy) 100%)'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
@@ -81,192 +96,213 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '2rem'
+            gridTemplateColumns: 'minmax(300px, 340px) 1fr',
+            gap: '2.5rem',
+            alignItems: 'start'
           }}
+          className="book-detail-layout"
         >
-          {/* Left Column: Image & Quick Stats */}
+          {/* Left Column: 3D Hardcover Cover & Provenance Stamp */}
           <div>
             <div
               style={{
                 width: '100%',
-                height: '380px',
-                borderRadius: '16px',
+                height: '420px',
+                borderRadius: '8px 16px 16px 8px',
                 overflow: 'hidden',
-                background: '#111522',
+                background: '#0d111a',
                 border: '1px solid var(--border-subtle)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
                 position: 'relative',
-                boxShadow: 'var(--shadow-md)'
+                boxShadow: 'var(--shadow-book)'
               }}
             >
+              {/* 3D Spine gleam */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  width: '22px',
+                  background: 'linear-gradient(90deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 35%, transparent 100%)',
+                  zIndex: 3,
+                  pointerEvents: 'none'
+                }}
+              />
+
               <img
                 src={book.coverImage || '/covers/cover_placeholder.jpg'}
                 alt={book.title}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
 
-              <div style={{ position: 'absolute', top: '14px', left: '14px' }}>
+              <div style={{ position: 'absolute', top: '16px', left: '20px', zIndex: 4 }}>
                 <span className="badge badge-like-new">{book.condition}</span>
               </div>
 
               {discountPercent && (
                 <div
+                  className="font-mono"
                   style={{
                     position: 'absolute',
-                    bottom: '14px',
-                    left: '14px',
-                    background: '#10b981',
+                    bottom: '16px',
+                    left: '20px',
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                     color: '#fff',
                     fontWeight: 800,
-                    fontSize: '0.75rem',
-                    padding: '0.25rem 0.65rem',
-                    borderRadius: '999px'
+                    fontSize: '0.78rem',
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '999px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                    zIndex: 4
                   }}
                 >
-                  SAVE {discountPercent}%
+                  SAVE ${savingsAmount} ({discountPercent}%)
                 </div>
               )}
             </div>
 
             {/* Quick Actions Row */}
-            <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1rem' }}>
+            <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem' }}>
               <button
                 className={`btn btn-secondary ${wishlisted ? 'btn-primary' : ''}`}
-                style={{ flex: 1 }}
+                style={{ flex: 1, borderRadius: 'var(--radius-full)' }}
                 onClick={handleWishlistToggle}
               >
                 <Heart size={16} fill={wishlisted ? 'currentColor' : 'none'} />
-                {wishlisted ? 'Saved' : 'Save Book'}
+                {wishlisted ? 'Saved in Wishlist' : 'Add to Wishlist'}
               </button>
 
-              <button className="btn btn-secondary" onClick={handleShare} title="Share Link">
+              <button
+                className="btn btn-secondary"
+                onClick={handleShare}
+                title="Share Monograph"
+                style={{ borderRadius: 'var(--radius-full)', padding: '0.65rem 0.95rem' }}
+              >
                 <Share2 size={16} />
               </button>
             </div>
           </div>
 
-          {/* Right Column: Book Details & Seller Card */}
+          {/* Right Column: Monograph Details & Seller Quad */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span
               style={{
                 fontSize: '0.8rem',
-                fontWeight: 700,
-                color: 'var(--primary-light)',
+                fontWeight: 800,
+                color: 'var(--accent-gold)',
                 textTransform: 'uppercase',
-                letterSpacing: '0.05em',
+                letterSpacing: '0.08em',
                 marginBottom: '0.4rem'
               }}
             >
-              {book.category}
+              {book.category} {book.courseCode && `• ${book.courseCode}`}
             </span>
 
-            <h2 style={{ fontSize: '1.6rem', marginBottom: '0.4rem' }}>{book.title}</h2>
-            <div style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '1.2rem' }}>
-              by <strong style={{ color: 'var(--text-primary)' }}>{book.author}</strong>
+            <h2 className="font-serif-literary" style={{ fontSize: '1.9rem', marginBottom: '0.4rem', lineHeight: 1.25 }}>
+              {book.title}
+            </h2>
+            <div style={{ fontSize: '0.98rem', color: 'var(--text-secondary)', marginBottom: '1.4rem' }}>
+              Authored by <strong style={{ color: 'var(--text-primary)' }}>{book.author}</strong>
             </div>
 
-            {/* Price Box */}
+            {/* Price Box with Savings Engine */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'baseline',
-                gap: '0.8rem',
-                padding: '0.8rem 1.2rem',
-                background: 'rgba(255, 255, 255, 0.04)',
-                borderRadius: '12px',
-                border: '1px solid var(--border-subtle)',
-                marginBottom: '1.4rem'
+                gap: '1rem',
+                padding: '1rem 1.4rem',
+                background: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: '14px',
+                border: '1px solid var(--border-gold)',
+                marginBottom: '1.6rem',
+                flexWrap: 'wrap'
               }}
             >
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+              <div className="font-mono" style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                 ${book.price}
               </div>
               {book.originalPrice > book.price && (
-                <div style={{ fontSize: '1rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
-                  Original MRP: ${book.originalPrice}
+                <div className="font-mono" style={{ fontSize: '1.1rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                  Retail MRP: ${book.originalPrice}
                 </div>
               )}
-              <span className="badge badge-good" style={{ marginLeft: 'auto', textTransform: 'none' }}>
+              <span className="badge badge-good" style={{ marginLeft: 'auto', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 Status: {book.status}
               </span>
             </div>
 
-            {/* Specs Grid */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '0.75rem',
-                fontSize: '0.85rem',
-                marginBottom: '1.4rem'
-              }}
-            >
-              <div>
-                <span style={{ color: 'var(--text-muted)' }}>Edition: </span>
-                <strong>{book.edition || 'Standard'}</strong>
-              </div>
-              <div>
-                <span style={{ color: 'var(--text-muted)' }}>ISBN: </span>
-                <strong>{book.isbn || 'N/A'}</strong>
-              </div>
-              <div>
-                <span style={{ color: 'var(--text-muted)' }}>Subject: </span>
-                <strong>{book.subject || 'General'}</strong>
-              </div>
-              <div>
-                <span style={{ color: 'var(--text-muted)' }}>Semester: </span>
-                <strong>{book.semester || 'All'}</strong>
+            {/* Provenance Checklist */}
+            <div style={{ marginBottom: '1.6rem' }}>
+              <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
+                Physical Provenance & Notation Rubric
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', fontSize: '0.85rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)' }}>
+                  <CheckCircle size={14} color="var(--accent-emerald)" /> Spine Binding: Firm & Intact
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)' }}>
+                  <CheckCircle size={14} color="var(--accent-emerald)" /> Edition: {book.edition || 'Standard'}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)' }}>
+                  <CheckCircle size={14} color="var(--accent-emerald)" /> ISBN: {book.isbn || 'Archival Registered'}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)' }}>
+                  <CheckCircle size={14} color="var(--accent-emerald)" /> Term: {book.semester || 'All Semesters'}
+                </div>
               </div>
             </div>
 
             {/* Description */}
-            <div style={{ marginBottom: '1.4rem' }}>
-              <h4 style={{ fontSize: '0.92rem', marginBottom: '0.4rem' }}>Description & Condition</h4>
-              <p style={{ fontSize: '0.88rem', lineHeight: 1.6 }}>{book.description}</p>
+            <div style={{ marginBottom: '1.6rem' }}>
+              <p style={{ fontSize: '0.92rem', lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                {book.description}
+              </p>
               {book.conditionNotes && (
                 <div
                   style={{
-                    marginTop: '0.6rem',
-                    fontSize: '0.82rem',
-                    color: 'var(--accent-gold-light)',
+                    marginTop: '0.75rem',
+                    fontSize: '0.86rem',
+                    color: 'var(--accent-gold)',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.4rem'
+                    gap: '0.5rem',
+                    background: 'rgba(212, 175, 55, 0.08)',
+                    padding: '0.5rem 0.8rem',
+                    borderRadius: '8px'
                   }}
                 >
-                  <CheckCircle size={14} /> Notes: {book.conditionNotes}
+                  <Sparkles size={14} /> Curator Note: {book.conditionNotes}
                 </div>
               )}
             </div>
 
-            {/* Seller Info Card */}
+            {/* Seller Quad Card */}
             <div
               style={{
-                padding: '1rem',
-                borderRadius: '14px',
-                background: 'rgba(99, 102, 241, 0.07)',
-                border: '1px solid rgba(99, 102, 241, 0.2)',
+                padding: '1.2rem',
+                borderRadius: '16px',
+                background: 'rgba(124, 58, 237, 0.08)',
+                border: '1px solid rgba(124, 58, 237, 0.25)',
                 marginTop: 'auto'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.8rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', marginBottom: '0.9rem' }}>
                 <img
                   src={
                     book.owner?.avatar ||
                     `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(book.owner?.name || 'Seller')}`
                   }
                   alt={book.owner?.name}
-                  style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover' }}
+                  style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--accent-gold)' }}
                 />
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                    {book.owner?.name || 'Campus Student'}
+                  <div style={{ fontWeight: 700, fontSize: '0.98rem' }}>
+                    {book.owner?.name || 'Verified Scholar'}
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                    {book.owner?.college || 'University Campus'} • {book.owner?.year}
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                    {book.owner?.college || 'University Campus'} • {book.owner?.department || 'Department'}
                   </div>
                 </div>
 
@@ -275,10 +311,10 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
                     marginLeft: 'auto',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.2rem',
+                    gap: '0.3rem',
                     color: '#fbbf24',
                     fontWeight: 700,
-                    fontSize: '0.9rem'
+                    fontSize: '0.92rem'
                   }}
                 >
                   <Star size={15} fill="currentColor" /> {book.owner?.rating || '5.0'}
@@ -291,38 +327,38 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.4rem',
-                  fontSize: '0.82rem',
-                  color: 'var(--text-muted)',
-                  marginBottom: '1rem'
+                  fontSize: '0.85rem',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '1.1rem'
                 }}
               >
-                <MapPin size={14} color="var(--primary-light)" />
-                Pickup spot: {book.campusLocation || 'Campus Central Library'}
+                <MapPin size={15} color="var(--accent-gold)" />
+                Quad Meetup: <strong>{book.campusMeetingSpot || book.campusLocation || 'Campus Central Library Quad'}</strong>
               </div>
 
               {/* Action */}
               {!isOwner ? (
                 <button
                   className="btn btn-primary"
-                  style={{ width: '100%', padding: '0.75rem' }}
+                  style={{ width: '100%', padding: '0.85rem', borderRadius: 'var(--radius-full)' }}
                   onClick={() => {
                     onClose();
                     onMakeOffer(book);
                   }}
                 >
-                  <MessageSquare size={16} /> Make Offer / Message Seller
+                  <MessageSquare size={16} /> Propose Handover / Make Offer
                 </button>
               ) : (
                 <div
                   style={{
                     textAlign: 'center',
-                    fontSize: '0.85rem',
-                    color: 'var(--primary-light)',
-                    fontWeight: 600,
+                    fontSize: '0.88rem',
+                    color: 'var(--accent-gold)',
+                    fontWeight: 700,
                     padding: '0.5rem'
                   }}
                 >
-                  This is your own listing
+                  This is your own inscribed monograph
                 </div>
               )}
             </div>

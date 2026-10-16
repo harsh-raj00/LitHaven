@@ -65,19 +65,19 @@ export const InquiryModal = ({ book, onClose, onSuccess }) => {
           <X size={18} />
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', marginBottom: '1.4rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', marginBottom: '1.6rem' }}>
           <img
             src={book.coverImage || '/covers/cover_placeholder.jpg'}
             alt={book.title}
-            style={{ width: '56px', height: '70px', borderRadius: '8px', objectFit: 'cover' }}
+            style={{ width: '60px', height: '80px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-gold)' }}
           />
           <div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--primary-light)', fontWeight: 700 }}>
-              MAKE AN OFFER TO SELLER
+            <div style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 800, letterSpacing: '0.06em' }}>
+              PROPOSE HANDOVER OFFER
             </div>
-            <h3 style={{ fontSize: '1.15rem', lineHeight: 1.3 }}>{book.title}</h3>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              Listed at: <strong style={{ color: 'var(--text-primary)' }}>${book.price}</strong> by{' '}
+            <h3 className="font-serif-literary" style={{ fontSize: '1.3rem', lineHeight: 1.25 }}>{book.title}</h3>
+            <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
+              Listed at: <strong className="font-mono" style={{ color: 'var(--text-primary)' }}>${book.price}</strong> by{' '}
               {book.owner?.name}
             </div>
           </div>
@@ -86,14 +86,15 @@ export const InquiryModal = ({ book, onClose, onSuccess }) => {
         <form onSubmit={handleSubmit}>
           {/* Offer Price */}
           <div className="form-group">
-            <label className="form-label">Your Offer Price ($)</label>
+            <label className="form-label">Your Proposed Offering Price ($)</label>
             <div style={{ position: 'relative' }}>
               <input
                 type="number"
                 min="0"
                 step="1"
                 required
-                className="form-input"
+                className="form-input font-mono"
+                style={{ fontSize: '1.1rem', fontWeight: 700 }}
                 value={offeredPrice}
                 onChange={(e) => setOfferedPrice(e.target.value)}
               />
@@ -102,7 +103,7 @@ export const InquiryModal = ({ book, onClose, onSuccess }) => {
 
           {/* Proposed Meetup Location */}
           <div className="form-group">
-            <label className="form-label">Proposed Campus Meetup Spot</label>
+            <label className="form-label">Proposed Campus Meetup Quad</label>
             <div style={{ position: 'relative' }}>
               <input
                 type="text"
@@ -110,39 +111,32 @@ export const InquiryModal = ({ book, onClose, onSuccess }) => {
                 className="form-input"
                 value={proposedLocation}
                 onChange={(e) => setProposedLocation(e.target.value)}
-                placeholder="e.g. Central Library Front Steps or Cafeteria"
+                placeholder="e.g. Central Library Front Steps or Quad Canteen"
               />
             </div>
           </div>
 
           {/* Quick Message Chips */}
-          <div style={{ marginBottom: '0.8rem' }}>
+          <div style={{ marginBottom: '1rem' }}>
             <div
               style={{
-                fontSize: '0.76rem',
+                fontSize: '0.74rem',
                 color: 'var(--text-muted)',
-                marginBottom: '0.4rem',
+                marginBottom: '0.45rem',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.3rem'
+                gap: '0.3rem',
+                letterSpacing: '0.04em'
               }}
             >
-              <Sparkles size={12} /> Suggested message starters:
+              <Sparkles size={12} color="var(--accent-gold)" /> QUICK HANDOVER PHRASES:
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
               {quickMessages.map((msg, i) => (
                 <button
                   key={i}
                   type="button"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: '999px',
-                    padding: '0.25rem 0.65rem',
-                    fontSize: '0.74rem',
-                    color: 'var(--text-secondary)',
-                    cursor: 'pointer'
-                  }}
+                  className="quick-chip"
                   onClick={() => setMessage(msg)}
                 >
                   {msg}
@@ -157,7 +151,7 @@ export const InquiryModal = ({ book, onClose, onSuccess }) => {
             <textarea
               required
               rows={3}
-              className="form-textarea"
+              className="form-input"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
@@ -167,9 +161,9 @@ export const InquiryModal = ({ book, onClose, onSuccess }) => {
             type="submit"
             className="btn btn-primary"
             disabled={submitting}
-            style={{ width: '100%', marginTop: '0.8rem' }}
+            style={{ width: '100%', marginTop: '1rem', borderRadius: 'var(--radius-full)', padding: '0.85rem' }}
           >
-            {submitting ? 'Sending Offer...' : <><Send size={16} /> Send Offer & Start Chat</>}
+            {submitting ? 'Transmitting Proposal...' : <><Send size={16} /> Transmit Offer & Open Channel</>}
           </button>
         </form>
       </div>

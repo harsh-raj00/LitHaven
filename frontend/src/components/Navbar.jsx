@@ -246,13 +246,96 @@ export const Navbar = ({ currentView, setCurrentView }) => {
           {/* Mobile hamburger toggle */}
           <button
             className="btn btn-ghost btn-sm mobile-menu-btn"
-            style={{ display: 'none', padding: '0.4rem' }}
+            style={{ padding: '0.4rem', border: '1px solid var(--border-subtle)', borderRadius: '10px' }}
             onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-label="Toggle Navigation"
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
+
+      {/* Responsive Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div
+          className="glass-panel"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            padding: '1.2rem 1.5rem',
+            borderTop: '1px solid var(--border-subtle)',
+            borderBottom: '1px solid var(--border-subtle)',
+            borderRadius: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.8rem',
+            background: 'var(--bg-glass-heavy)',
+            backdropFilter: 'blur(20px)',
+            animation: 'fadeIn 0.25s ease'
+          }}
+        >
+          <button
+            className={`btn btn-ghost ${currentView === 'home' ? 'active' : ''}`}
+            style={{ justifyContent: 'flex-start', padding: '0.7rem 1rem' }}
+            onClick={() => handleNav('home')}
+          >
+            <Sparkles size={18} color="var(--accent-gold)" /> Discover Atelier
+          </button>
+          <button
+            className={`btn btn-ghost ${currentView === 'marketplace' ? 'active' : ''}`}
+            style={{ justifyContent: 'flex-start', padding: '0.7rem 1rem' }}
+            onClick={() => handleNav('marketplace')}
+          >
+            <Search size={18} /> The Codex Exchange
+          </button>
+          <button
+            className={`btn btn-ghost ${currentView === 'vault' ? 'active' : ''}`}
+            style={{ justifyContent: 'flex-start', padding: '0.7rem 1rem' }}
+            onClick={() => handleNav('vault')}
+          >
+            <FileText size={18} /> The Scriptorium
+          </button>
+
+          {isAuthenticated ? (
+            <>
+              <button
+                className={`btn btn-ghost ${currentView === 'inquiries' ? 'active' : ''}`}
+                style={{ justifyContent: 'flex-start', padding: '0.7rem 1rem' }}
+                onClick={() => handleNav('inquiries')}
+              >
+                <MessageSquare size={18} /> Campus Offers & Chats
+              </button>
+              <button
+                className={`btn btn-ghost ${currentView === 'dashboard' ? 'active' : ''}`}
+                style={{ justifyContent: 'flex-start', padding: '0.7rem 1rem' }}
+                onClick={() => handleNav('dashboard')}
+              >
+                <LayoutDashboard size={18} /> Scholar's Dashboard
+              </button>
+              <button
+                className="btn btn-accent"
+                style={{ width: '100%', marginTop: '0.5rem' }}
+                onClick={() => handleNav('sell')}
+              >
+                <PlusCircle size={18} /> Scribe Studio (List Monograph)
+              </button>
+            </>
+          ) : (
+            <button
+              className="btn btn-primary"
+              style={{ width: '100%', marginTop: '0.5rem' }}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                openAuthModal('login');
+              }}
+            >
+              Sign In to Sanctuary
+            </button>
+          )}
+        </div>
+      )}
     </nav>
   );
 };

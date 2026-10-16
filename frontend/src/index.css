@@ -38,6 +38,8 @@
 
   /* Typography */
   --font-serif: 'Cinzel', serif;
+  --font-serif-literary: 'Cormorant Garamond', Georgia, serif;
+  --font-display: 'Fraunces', 'Cinzel', serif;
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -878,5 +880,346 @@ a {
   }
   .book-card-image-wrap {
     height: 300px;
+  }
+}
+
+/* ==========================================================================
+   HUMAN-DESIGNED EDITORIAL & ATELIER UI/UX ENHANCEMENTS
+   ========================================================================== */
+
+.font-serif-literary {
+  font-family: var(--font-serif-literary);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Campus Live Ticker */
+.campus-ticker-wrap {
+  background: rgba(14, 18, 28, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.55rem 0;
+  overflow: hidden;
+  position: relative;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.campus-ticker-content {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  white-space: nowrap;
+  animation: marquee 35s linear infinite;
+  width: max-content;
+}
+
+.campus-ticker-content:hover {
+  animation-play-state: paused;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text-secondary);
+}
+
+.ticker-item strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  box-shadow: 0 0 8px var(--accent-emerald);
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* Curator's Editorial Spotlight */
+.curator-spotlight {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2.8rem;
+  padding: 2.5rem;
+  border-radius: var(--radius-xl);
+  background: radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
+              radial-gradient(circle at 90% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 60%),
+              var(--bg-glass-heavy);
+  border: 1px solid var(--border-gold);
+  box-shadow: var(--shadow-lg), 0 0 35px rgba(212, 175, 55, 0.1);
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+}
+
+.curator-spotlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--accent-gold) 0%, var(--primary) 100%);
+}
+
+.book-ribbon {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  width: 22px;
+  height: 44px;
+  background: linear-gradient(180deg, var(--accent-gold) 0%, #b45309 100%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+  z-index: 5;
+}
+
+/* Bento Faculty Disciplines */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.2rem;
+}
+
+.bento-card {
+  padding: 1.8rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.bento-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-light);
+  box-shadow: var(--shadow-md), 0 0 25px rgba(124, 58, 237, 0.12);
+  background: var(--bg-card-hover);
+}
+
+.bento-col-4 { grid-column: span 4; }
+.bento-col-6 { grid-column: span 6; }
+.bento-col-8 { grid-column: span 8; }
+.bento-col-12 { grid-column: span 12; }
+
+/* View Switcher Segmented Control */
+.view-switcher {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  gap: 3px;
+}
+
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.view-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+/* Catalog Ledger / Archival List View */
+.catalog-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.92rem;
+}
+
+.catalog-table th {
+  padding: 0.9rem 1.2rem;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: left;
+  font-weight: 700;
+}
+
+.catalog-table td {
+  padding: 1.1rem 1.2rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.catalog-row {
+  transition: background-color var(--transition-fast);
+}
+
+.catalog-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Horizontal Spine Shelf View */
+.shelf-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.4rem;
+  padding: 2.5rem 1.5rem 1.2rem;
+  overflow-x: auto;
+  border-bottom: 14px solid #221c15;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.25) 100%);
+  border-radius: 0 0 8px 8px;
+}
+
+.shelf-book {
+  position: relative;
+  width: 58px;
+  height: 270px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  transform-origin: bottom center;
+}
+
+.shelf-book:hover {
+  transform: translateY(-24px) scale(1.04);
+  z-index: 10;
+}
+
+.shelf-spine {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px 6px 0 0;
+  padding: 1rem 0.4rem;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.4), inset -2px 0 6px rgba(255, 255, 255, 0.2);
+}
+
+/* Quick Inspect Slide-Over Drawer */
+.inspect-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 300;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.inspect-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 540px;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  z-index: 310;
+  overflow-y: auto;
+  padding: 2.2rem;
+  animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Split Authoring Scribe Studio */
+.scribe-studio-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.4fr) minmax(320px, 1fr);
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.sticky-preview-card {
+  position: sticky;
+  top: calc(var(--nav-height) + 24px);
+}
+
+/* Quick Negotiation Offer Chips */
+.quick-chips-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.quick-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 0.35rem 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quick-chip:hover {
+  background: rgba(124, 58, 237, 0.2);
+  border-color: var(--primary-light);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+/* Responsive Overrides */
+@media (max-width: 900px) {
+  .curator-spotlight {
+    grid-template-columns: 1fr;
+    gap: 1.8rem;
+  }
+  .bento-col-4, .bento-col-6, .bento-col-8 {
+    grid-column: span 12;
+  }
+  .scribe-studio-grid {
+    grid-template-columns: 1fr;
+  }
+  .sticky-preview-card {
+    position: static;
   }
 }

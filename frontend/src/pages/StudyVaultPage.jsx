@@ -13,7 +13,11 @@ import {
   X,
   CheckCircle,
   FileUp,
-  Tag
+  Tag,
+  Shield,
+  Award,
+  Scroll,
+  Layers
 } from 'lucide-react';
 
 export const StudyVaultPage = () => {
@@ -62,7 +66,7 @@ export const StudyVaultPage = () => {
         setResources(data.resources);
       }
     } catch (err) {
-      console.error('Failed to load study vault:', err);
+      console.error('Failed to load scriptorium manuscripts:', err);
     } finally {
       setLoading(false);
     }
@@ -103,7 +107,7 @@ export const StudyVaultPage = () => {
 
       const res = await api.resources.create(formData);
       if (res.success) {
-        showToast('Study resource added to the Vault!', 'success');
+        showToast('Manuscript preserved in The Scriptorium!', 'success');
         setUploadModalOpen(false);
         setUploadForm({
           title: '',
@@ -119,7 +123,7 @@ export const StudyVaultPage = () => {
         fetchResources();
       }
     } catch (err) {
-      showToast(err.message || 'Failed to upload study resource', 'error');
+      showToast(err.message || 'Failed to deposit manuscript', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -128,29 +132,33 @@ export const StudyVaultPage = () => {
   return (
     <div style={{ padding: '2.5rem 0 4rem' }}>
       <div className="content-wrapper">
-        {/* Header Banner */}
+        {/* Header Archival Chamber Banner */}
         <div
           className="glass-panel"
           style={{
-            padding: '2.5rem',
+            padding: '2.8rem',
             marginBottom: '2.5rem',
-            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(6, 182, 212, 0.08) 100%)',
-            border: '1px solid rgba(99, 102, 241, 0.25)',
+            background: 'radial-gradient(circle at 10% 10%, rgba(212, 175, 55, 0.12) 0%, transparent 60%), radial-gradient(circle at 90% 90%, rgba(124, 58, 237, 0.12) 0%, transparent 60%), var(--bg-glass-heavy)',
+            border: '1px solid var(--border-gold)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '1.5rem'
+            gap: '1.8rem',
+            borderRadius: 'var(--radius-xl)',
+            boxShadow: 'var(--shadow-lg)'
           }}
         >
           <div>
-            <div className="hero-badge-tag" style={{ marginBottom: '0.6rem' }}>
-              <FileText size={14} /> Open Scholarly Compendium & Archives
+            <div className="hero-badge-tag" style={{ marginBottom: '0.8rem' }}>
+              <Scroll size={14} color="var(--accent-gold)" /> OPEN ACADEMIC COMPENDIUM & PRESERVATION CHAMBER
             </div>
-            <h1 style={{ fontSize: '2.2rem', marginBottom: '0.4rem' }}>The Scriptorium</h1>
-            <p style={{ maxWidth: '600px' }}>
-              Curated academic manuscripts, high-yield syllabi, research syntheses, and peer exam
-              digests freely preserved for the academic community.
+            <h1 className="font-display" style={{ fontSize: '2.4rem', marginBottom: '0.5rem' }}>
+              The Scriptorium
+            </h1>
+            <p className="font-serif-literary" style={{ fontSize: '1.25rem', maxWidth: '640px', color: 'var(--text-secondary)' }}>
+              A sanctuary of peer-verified lecture compendiums, high-yield examination solutions, and
+              syllabi syntheses freely accessible to every university scholar.
             </p>
           </div>
 
@@ -163,12 +171,13 @@ export const StudyVaultPage = () => {
                 setUploadModalOpen(true);
               }
             }}
+            style={{ padding: '0.85rem 1.8rem', borderRadius: 'var(--radius-full)' }}
           >
             <Upload size={18} /> Deposit Manuscript
           </button>
         </div>
 
-        {/* Filter bar */}
+        {/* Filter and Search Bar */}
         <div
           style={{
             display: 'flex',
@@ -176,46 +185,52 @@ export const StudyVaultPage = () => {
             justifyContent: 'space-between',
             flexWrap: 'wrap',
             gap: '1.2rem',
-            marginBottom: '2rem'
+            marginBottom: '2.2rem'
           }}
         >
-          {/* FileType Chips */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {fileTypes.map((type, i) => (
+          {/* File Types Segmented Pills */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
+            {fileTypes.map((type, idx) => (
               <button
-                key={i}
+                key={idx}
                 type="button"
                 style={{
-                  background:
-                    fileTypeFilter === type ? 'var(--primary)' : 'rgba(255, 255, 255, 0.06)',
+                  background: fileTypeFilter === type ? 'var(--primary)' : 'rgba(255, 255, 255, 0.04)',
                   color: fileTypeFilter === type ? '#ffffff' : 'var(--text-secondary)',
-                  border: '1px solid var(--border-subtle)',
+                  border: `1px solid ${fileTypeFilter === type ? 'var(--primary-light)' : 'var(--border-subtle)'}`,
                   padding: '0.45rem 1rem',
                   borderRadius: '999px',
+                  fontSize: '0.82rem',
                   fontWeight: 600,
-                  fontSize: '0.85rem',
                   cursor: 'pointer',
-                  transition: 'all 0.15s'
+                  transition: 'all 0.15s ease'
                 }}
                 onClick={() => setFileTypeFilter(type)}
               >
-                {type}
+                {type === 'All' ? 'All Manuscripts' : type}
               </button>
             ))}
           </div>
 
-          {/* Search bar */}
-          <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '0.6rem', flex: '1 1 260px', maxWidth: '400px' }}>
-            <input
-              type="text"
-              placeholder="Search by topic, course, or tag..."
-              className="form-input"
-              style={{ borderRadius: '999px' }}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <button type="submit" className="btn btn-primary btn-sm">
-              <Search size={16} />
+          {/* Search Input */}
+          <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '0.6rem', minWidth: '300px' }}>
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type="text"
+                className="form-input"
+                style={{ paddingLeft: '2.4rem', borderRadius: '999px', fontSize: '0.88rem' }}
+                placeholder="Filter by subject or exam title..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Search
+                size={15}
+                color="var(--accent-gold)"
+                style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
+              />
+            </div>
+            <button type="submit" className="btn btn-secondary btn-sm" style={{ padding: '0 1rem', borderRadius: '999px' }}>
+              Filter
             </button>
           </form>
         </div>
@@ -223,23 +238,37 @@ export const StudyVaultPage = () => {
         {/* Resources Grid */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '5rem 0' }}>
-            <p>Loading study vault documents...</p>
+            <div
+              style={{
+                display: 'inline-block',
+                width: '40px',
+                height: '40px',
+                border: '3px solid rgba(124, 58, 237, 0.2)',
+                borderTopColor: 'var(--primary)',
+                borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite'
+              }}
+            />
+            <p style={{ marginTop: '1rem', color: 'var(--text-secondary)' }}>
+              Unrolling scriptorium scrolls...
+            </p>
           </div>
         ) : resources.length === 0 ? (
-          <div className="glass-panel" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-            <FileText size={48} color="var(--text-muted)" style={{ margin: '0 auto 1rem' }} />
-            <h3>No study materials found</h3>
-            <p style={{ margin: '0.5rem auto 1.2rem', maxWidth: '400px' }}>
-              Be the first student to upload notes for this subject and earn community karma!
+          <div className="glass-panel" style={{ textAlign: 'center', padding: '4.5rem 2rem' }}>
+            <Scroll size={48} color="var(--accent-gold)" style={{ margin: '0 auto 1.2rem' }} />
+            <h3 className="font-display">No manuscripts recorded for this filter</h3>
+            <p style={{ maxWidth: '420px', margin: '0.6rem auto 1.5rem', color: 'var(--text-secondary)' }}>
+              Be the first scholar to deposit study notes, formula cheat sheets, or past question papers
+              for this discipline.
             </p>
             <button
               className="btn btn-primary btn-sm"
               onClick={() => {
-                if (!isAuthenticated) openAuthModal('login');
-                else setUploadModalOpen(true);
+                setFileTypeFilter('All');
+                setSearch('');
               }}
             >
-              Upload Material
+              Reset Filters
             </button>
           </div>
         ) : (
@@ -247,7 +276,7 @@ export const StudyVaultPage = () => {
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-              gap: '1.6rem'
+              gap: '1.8rem'
             }}
           >
             {resources.map((res) => (
@@ -255,158 +284,192 @@ export const StudyVaultPage = () => {
             ))}
           </div>
         )}
-      </div>
 
-      {/* Upload Modal */}
-      {uploadModalOpen && (
-        <div className="modal-overlay" onClick={() => setUploadModalOpen(false)}>
+        {/* Deposit Manuscript Modal */}
+        {uploadModalOpen && (
           <div
-            className="modal-content"
-            style={{ maxWidth: '580px', padding: '2.2rem' }}
-            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(5, 7, 12, 0.85)',
+              backdropFilter: 'blur(10px)',
+              zIndex: 300,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1.5rem'
+            }}
+            onClick={() => setUploadModalOpen(false)}
           >
-            <button
-              className="modal-close-btn"
-              onClick={() => setUploadModalOpen(false)}
-              aria-label="Close"
+            <div
+              className="glass-panel"
+              style={{
+                width: '100%',
+                maxWidth: '620px',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                padding: '2.4rem',
+                position: 'relative',
+                border: '1px solid var(--border-gold)',
+                boxShadow: 'var(--shadow-lg)'
+              }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <X size={18} />
-            </button>
+              <button
+                className="btn btn-ghost btn-sm"
+                style={{ position: 'absolute', top: '16px', right: '16px', padding: '0.4rem' }}
+                onClick={() => setUploadModalOpen(false)}
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
 
-            <div style={{ marginBottom: '1.4rem' }}>
-              <div className="badge badge-like-new" style={{ marginBottom: '0.4rem' }}>
-                SCRIPTORIUM CONTRIBUTOR
-              </div>
-              <h2 style={{ fontSize: '1.6rem' }}>Deposit Scholarly Material</h2>
-              <p style={{ fontSize: '0.88rem' }}>
-                Preserve and share high-yield lecture digests, formula compendiums, and solved examinations.
-              </p>
-            </div>
-
-            <form onSubmit={handleUploadSubmit}>
-              <div className="form-group">
-                <label className="form-label">Resource Title</label>
-                <input
-                  type="text"
-                  required
-                  className="form-input"
-                  placeholder="e.g. CS204: Algorithms Dynamic Programming Master Sheet"
-                  value={uploadForm.title}
-                  onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
-                />
+              <div style={{ marginBottom: '1.6rem' }}>
+                <div className="badge badge-like-new" style={{ marginBottom: '0.4rem' }}>
+                  SCRIPTORIUM CONTRIBUTOR
+                </div>
+                <h2 className="font-display" style={{ fontSize: '1.8rem' }}>Deposit Scholarly Material</h2>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                  Help peers master complex disciplines with high-yield manuscripts and solved examinations.
+                </p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <form onSubmit={handleUploadSubmit}>
                 <div className="form-group">
-                  <label className="form-label">Subject / Course</label>
+                  <label className="form-label">Manuscript Title</label>
                   <input
                     type="text"
                     required
                     className="form-input"
-                    placeholder="e.g. Operating Systems"
-                    value={uploadForm.subject}
-                    onChange={(e) => setUploadForm({ ...uploadForm, subject: e.target.value })}
+                    placeholder="e.g. CS204: Algorithms Dynamic Programming Master Compendium"
+                    value={uploadForm.title}
+                    onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label className="form-label">Discipline / Faculty</label>
+                    <select
+                      className="form-input"
+                      value={uploadForm.category}
+                      onChange={(e) => setUploadForm({ ...uploadForm, category: e.target.value })}
+                    >
+                      <option value="Computer Science & AI">Computer Science & AI</option>
+                      <option value="Medical & Healthcare">Medical & Healthcare</option>
+                      <option value="Engineering & Technology">Engineering & Technology</option>
+                      <option value="Commerce, Finance & MBA">Commerce, Finance & MBA</option>
+                      <option value="Natural Sciences & Math">Natural Sciences & Math</option>
+                      <option value="Competitive Exams">Competitive Exams</option>
+                      <option value="Law & Legal Studies">Law & Legal Studies</option>
+                      <option value="Humanities & Social Sciences">Humanities & Social Sciences</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Document Classification</label>
+                    <select
+                      className="form-input"
+                      value={uploadForm.fileType}
+                      onChange={(e) => setUploadForm({ ...uploadForm, fileType: e.target.value })}
+                    >
+                      <option value="Cheat Sheet">Cheat Sheet / Summary</option>
+                      <option value="Notes">Lecture Notes</option>
+                      <option value="Question Paper">Past Solved Exam Paper</option>
+                      <option value="Solution">Lab Manual & Solutions</option>
+                      <option value="Presentation">Slide Deck Summary</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label className="form-label">Course Subject</label>
+                    <input
+                      type="text"
+                      required
+                      className="form-input"
+                      placeholder="e.g. Distributed Consensus"
+                      value={uploadForm.subject}
+                      onChange={(e) => setUploadForm({ ...uploadForm, subject: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Target Semester / Level</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="e.g. Semester 5 or Graduate"
+                      value={uploadForm.semester}
+                      onChange={(e) => setUploadForm({ ...uploadForm, semester: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Curatorial Summary & Insights</label>
+                  <textarea
+                    rows={3}
+                    className="form-input"
+                    placeholder="Highlight key theorems, exam weightage, or topics covered..."
+                    value={uploadForm.description}
+                    onChange={(e) => setUploadForm({ ...uploadForm, description: e.target.value })}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">File Type</label>
-                  <select
-                    className="form-select"
-                    value={uploadForm.fileType}
-                    onChange={(e) => setUploadForm({ ...uploadForm, fileType: e.target.value })}
-                  >
-                    <option value="Cheat Sheet">Cheat Sheet</option>
-                    <option value="Notes">Lecture Notes</option>
-                    <option value="Question Paper">Solved Question Paper</option>
-                    <option value="Presentation">Presentation</option>
-                    <option value="Assignment">Assignment</option>
-                    <option value="Solution">Exam Solution</option>
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-                <div className="form-group">
-                  <label className="form-label">Academic Category</label>
-                  <select
-                    className="form-select"
-                    value={uploadForm.category}
-                    onChange={(e) => setUploadForm({ ...uploadForm, category: e.target.value })}
-                  >
-                    <option value="Computer Science & AI">Computer Science & AI</option>
-                    <option value="Medical & Healthcare">Medical & Healthcare</option>
-                    <option value="Engineering & Technology">Engineering & Technology</option>
-                    <option value="Commerce, Finance & MBA">Commerce, Finance & MBA</option>
-                    <option value="Natural Sciences & Math">Natural Sciences & Math</option>
-                    <option value="Competitive Exams">Competitive Exams</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Target Semester</label>
+                  <label className="form-label">Search Tags (Comma separated)</label>
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Semester 3 or Final Year"
-                    value={uploadForm.semester}
-                    onChange={(e) => setUploadForm({ ...uploadForm, semester: e.target.value })}
+                    placeholder="e.g. algorithms, dynamic programming, leetcode, midterms"
+                    value={uploadForm.tags}
+                    onChange={(e) => setUploadForm({ ...uploadForm, tags: e.target.value })}
                   />
                 </div>
-              </div>
 
-              <div className="form-group">
-                <label className="form-label">Tags (comma separated)</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. DSA, DP, Graphs, Solved, MidSem"
-                  value={uploadForm.tags}
-                  onChange={(e) => setUploadForm({ ...uploadForm, tags: e.target.value })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">File Document or Shared Link</label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                  <input
-                    type="file"
-                    className="form-input"
-                    onChange={(e) => setSelectedFile(e.target.files[0])}
-                  />
-                  <input
-                    type="url"
-                    className="form-input"
-                    placeholder="Or paste public Google Drive / Notion / PDF link"
-                    value={uploadForm.fileUrl}
-                    onChange={(e) => setUploadForm({ ...uploadForm, fileUrl: e.target.value })}
-                  />
+                {/* File Attachment or URL */}
+                <div className="form-group">
+                  <label className="form-label">Upload PDF Document or Provide Cloud Link</label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx,.ppt,.pptx"
+                      onChange={(e) => setSelectedFile(e.target.files[0])}
+                      style={{ fontSize: '0.85rem' }}
+                    />
+                    <div style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>— OR —</div>
+                    <input
+                      type="url"
+                      className="form-input"
+                      placeholder="Paste Google Drive / OneDrive public document link"
+                      value={uploadForm.fileUrl}
+                      onChange={(e) => setUploadForm({ ...uploadForm, fileUrl: e.target.value })}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="form-group">
-                <label className="form-label">Brief Description</label>
-                <textarea
-                  rows={2}
-                  className="form-textarea"
-                  placeholder="Summarize key topics covered..."
-                  value={uploadForm.description}
-                  onChange={(e) => setUploadForm({ ...uploadForm, description: e.target.value })}
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={submitting}
-                style={{ width: '100%', marginTop: '0.6rem', padding: '0.8rem' }}
-              >
-                {submitting ? 'Publishing to Vault...' : <><Upload size={16} /> Publish Resource</>}
-              </button>
-            </form>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.8rem', marginTop: '2rem' }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setUploadModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {submitting ? 'Preserving in Archives...' : 'Confirm Deposit'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
