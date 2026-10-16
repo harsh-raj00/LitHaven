@@ -299,9 +299,27 @@ npm run dev
 # Frontend will open on http://localhost:5173
 ```
 
-Now open **[http://localhost:5173](http://localhost:5173)** in your browser!
+Now open **[http://localhost:5174](http://localhost:5174)** in your browser!
 
 ---
+
+## 🌿 Git Branches & Reversible Architecture
+
+LitHaven features a strict Git branch architecture for zero-risk testing and evaluation:
+
+```bash
+# To view all branches
+git branch
+
+# Currently on the Redesigned Human-Crafted Editorial Experience:
+git checkout redesign/pro-uiux
+
+# To return to the Original Baseline State:
+git checkout main
+```
+
+- **`main`**: The clean original backup state of LitHaven before the UI/UX redesign.
+- **`redesign/pro-uiux`**: The completely redesigned production application with editorial typography, tactile 3D spine lighting, multi-view exchange (Grid, Ledger, Bookshelf), and collegiate academic aesthetics.
 
 ## 📡 API Reference
 
