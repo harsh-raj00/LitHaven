@@ -1,0 +1,25 @@
+{
+  "name": "lithaven-workspace",
+  "version": "1.0.0",
+  "description": "LitHaven — Modern MERN Academic Book Marketplace & Study Sanctuary",
+  "private": true,
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "seed": "npm --prefix backend run seed",
+    "server": "npm --prefix backend start",
+    "client": "npm --prefix frontend run dev",
+    "build:client": "npm --prefix frontend run build"
+  },
+  "keywords": [
+    "mern",
+    "mongodb",
+    "express",
+    "react",
+    "node",
+    "textbooks",
+    "academic-marketplace",
+    "study-vault"
+  ],
+  "author": "Harsh Raj",
+  "license": "MIT"
+}
