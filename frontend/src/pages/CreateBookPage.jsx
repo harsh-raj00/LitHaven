@@ -8,9 +8,7 @@ import {
   Upload,
   Image as ImageIcon,
   MapPin,
-  CheckCircle,
-  Eye,
-  ArrowRight
+  CheckCircle
 } from 'lucide-react';
 
 export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
@@ -25,9 +23,8 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
     { name: 'Cracking the Coding Interview (Studio Royal Violet)', url: '/covers/cover_interview_prep.jpg' },
     { name: 'GATE Computer Science & IT (Studio Crimson Red)', url: '/covers/cover_competitive_exams.jpg' },
     { name: 'Operating System Concepts (Studio Terracotta Orange)', url: '/covers/cover_operating_systems.jpg' },
-    { name: 'Clean Code (Studio Forest Green)', url: '/covers/cover_clean_code.jpg' },
-    { name: 'Cybernetic Systems & Robotics (Studio Deep Slate)', url: '/covers/cover_cybernetics.jpg' },
-    { name: 'Neural Architectures & AI (Studio Royal Indigo)', url: '/covers/cover_neural.jpg' },
+    { name: 'Control Systems Engineering (Studio Technical Slate)', url: '/covers/cover_control_systems_nise.jpg' },
+    { name: 'Artificial Intelligence: A Modern Approach (Studio Royal Blue)', url: '/covers/cover_ai_russell_norvig.jpg' },
     { name: 'Quantum Dynamics (Studio Cyan Sapphire)', url: '/covers/cover_quantum.jpg' },
     { name: 'Deep Astrophysics (Studio Midnight Navy)', url: '/covers/cover_astrophysics.jpg' },
     { name: 'Algebraic Topology (Studio Ultramarine Blue)', url: '/covers/cover_topology.jpg' }

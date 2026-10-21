@@ -17,12 +17,24 @@ import {
 
 export const Navbar = ({ currentView, setCurrentView }) => {
   const { user, isAuthenticated, logout, openAuthModal } = useAuth();
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => {
+    try {
+      const stored = localStorage.getItem('lithaven_theme');
+      if (stored === 'dark' || stored === 'light') return stored;
+      if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+    } catch (e) {}
+    return 'light';
+  });
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('lithaven_theme', theme);
+    } catch (e) {}
   }, [theme]);
 
   // Close mobile drawer on desktop resize & handle Escape

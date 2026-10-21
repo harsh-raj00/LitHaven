@@ -86,7 +86,8 @@ router.get('/my-inquiries', protect, async (req, res, next) => {
       .sort({ lastMessageAt: -1, createdAt: -1, _id: -1 })
       .populate('book', 'title author coverImage price status')
       .populate('buyer', 'name college department avatar')
-      .populate('seller', 'name college department avatar');
+      .populate('seller', 'name college department avatar')
+      .populate('messages.sender', 'name avatar');
 
     res.json({
       success: true,

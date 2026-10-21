@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
-import { X, Send, MapPin, DollarSign, MessageSquare, Sparkles } from 'lucide-react';
+import { formatINR } from '../utils/formatters';
+import { X, Send, MapPin, MessageSquare, Sparkles } from 'lucide-react';
 
 export const InquiryModal = ({ book, onClose, onSuccess }) => {
   const { isAuthenticated, openAuthModal } = useAuth();
@@ -69,15 +70,15 @@ export const InquiryModal = ({ book, onClose, onSuccess }) => {
           <img
             src={book.coverImage || '/covers/cover_placeholder.jpg'}
             alt={book.title}
-            style={{ width: '60px', height: '80px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-gold)' }}
+            style={{ width: '60px', height: '80px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-subtle)' }}
           />
           <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 800, letterSpacing: '0.06em' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--accent-terracotta)', fontWeight: 800, letterSpacing: '0.06em' }}>
               PROPOSE HANDOVER OFFER
             </div>
             <h3 className="font-serif-literary" style={{ fontSize: '1.3rem', lineHeight: 1.25 }}>{book.title}</h3>
             <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
-              Listed at: <strong className="font-mono" style={{ color: 'var(--text-primary)' }}>${book.price}</strong> by{' '}
+              Listed at: <strong className="font-mono" style={{ color: 'var(--text-primary)' }}>{formatINR(book.price)}</strong> by{' '}
               {book.owner?.name}
             </div>
           </div>
@@ -86,7 +87,7 @@ export const InquiryModal = ({ book, onClose, onSuccess }) => {
         <form onSubmit={handleSubmit}>
           {/* Offer Price */}
           <div className="form-group">
-            <label className="form-label">Your Proposed Offering Price ($)</label>
+            <label className="form-label">Your Proposed Offering Price (₹)</label>
             <div style={{ position: 'relative' }}>
               <input
                 type="number"

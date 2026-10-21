@@ -54,16 +54,16 @@ export const InquiriesPage = () => {
 
         // Keep existing selected inquiry updated without jumping to first item
         setSelectedInquiry((prev) => {
-          const currentId = selectedInquiryIdRef.current || prev?._id;
+          const currentId = selectedInquiryIdRef.current || (prev?._id ? String(prev._id) : null);
           if (currentId) {
-            const found = sorted.find((i) => i._id === currentId);
+            const found = sorted.find((i) => String(i._id) === String(currentId));
             if (found) {
               return found;
             }
           }
           // Only auto-select sorted[0] on initial load if nothing is selected
           if (!selectedInquiryIdRef.current && !prev && sorted.length > 0) {
-            selectedInquiryIdRef.current = sorted[0]._id;
+            selectedInquiryIdRef.current = String(sorted[0]._id);
             return sorted[0];
           }
           return prev || (sorted[0] || null);
@@ -80,10 +80,10 @@ export const InquiriesPage = () => {
     fetchInquiries();
     const interval = setInterval(fetchInquiries, 8000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
 
   const handleSelectInquiry = (inq) => {
-    selectedInquiryIdRef.current = inq._id;
+    selectedInquiryIdRef.current = String(inq._id);
     setSelectedInquiry(inq);
     setShowChatMobile(true);
   };
@@ -213,7 +213,7 @@ export const InquiriesPage = () => {
               <div className="inquiries-list-scroll">
                 {inquiries.map((inq) => {
                   const otherParty = getOtherParty(inq);
-                  const isSelected = selectedInquiry?._id === inq._id;
+                  const isSelected = String(selectedInquiry?._id) === String(inq._id);
                   const sellerMode = isSeller(inq);
                   const lastTime = formatTimeAgo(inq.lastMessageAt || inq.createdAt);
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api';
 import { BookCard } from '../components/BookCard';
 import { formatINR } from '../utils/formatters';
@@ -33,18 +33,24 @@ export const MarketplacePage = ({
   const [search, setSearch] = useState(searchQuery || '');
   const [selectedCategory, setSelectedCategory] = useState(categoryFilter || '');
   const [selectedCondition, setSelectedCondition] = useState('');
+  const [selectedSemester, setSelectedSemester] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [viewMode, setViewMode] = useState('grid'); // 'grid', 'list', 'shelf'
   const [categoriesList, setCategoriesList] = useState([]);
 
+  // Sequence ref to prevent race conditions from out-of-order async responses
+  const reqSequenceRef = useRef(0);
+
   const fetchBooks = async (overrides = {}) => {
     setLoading(true);
+    const reqId = ++reqSequenceRef.current;
     try {
       const activeSearch = overrides.search !== undefined ? overrides.search : search;
       const activeCategory = overrides.category !== undefined ? overrides.category : selectedCategory;
       const activeCondition = overrides.condition !== undefined ? overrides.condition : selectedCondition;
+      const activeSemester = overrides.semester !== undefined ? overrides.semester : selectedSemester;
       const activeMin = overrides.minPrice !== undefined ? overrides.minPrice : minPrice;
       const activeMax = overrides.maxPrice !== undefined ? overrides.maxPrice : maxPrice;
       const activeSort = overrides.sort !== undefined ? overrides.sort : sortBy;
@@ -57,21 +63,26 @@ export const MarketplacePage = ({
         search: activeSearch,
         category: activeCategory,
         condition: activeCondition,
+        semester: activeSemester,
         minPrice: activeMin,
         maxPrice: activeMax,
         sort: activeSort
       };
 
       const data = await api.books.getAll(params);
+      if (reqId !== reqSequenceRef.current) return; // Stale response, discard
       if (data.success) {
         setBooks(data.books);
         setTotal(data.total);
         setTotalPages(data.pages);
       }
     } catch (err) {
+      if (reqId !== reqSequenceRef.current) return;
       console.error('Failed to fetch marketplace books:', err);
     } finally {
-      setLoading(false);
+      if (reqId === reqSequenceRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -146,7 +157,7 @@ export const MarketplacePage = ({
 
   useEffect(() => {
     fetchBooks();
-  }, [currentPage, selectedCategory, selectedCondition, sortBy, viewMode]);
+  }, [currentPage, selectedCategory, selectedCondition, selectedSemester, sortBy, viewMode]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -160,6 +171,7 @@ export const MarketplacePage = ({
     if (setCategoryFilter) setCategoryFilter('');
     setSelectedCategory('');
     setSelectedCondition('');
+    setSelectedSemester('');
     setMinPrice('');
     setMaxPrice('');
     setSortBy('newest');
@@ -168,6 +180,7 @@ export const MarketplacePage = ({
       search: '',
       category: '',
       condition: '',
+      semester: '',
       minPrice: '',
       maxPrice: '',
       sort: 'newest',
@@ -374,7 +387,7 @@ export const MarketplacePage = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, fontSize: '0.9rem' }}>
                 <SlidersHorizontal size={15} /> Filters
               </div>
-              {(selectedCategory || selectedCondition || minPrice || maxPrice || search) && (
+              {(selectedCategory || selectedCondition || selectedSemester || minPrice || maxPrice || search) && (
                 <button
                   type="button"
                   style={{
@@ -496,6 +509,56 @@ export const MarketplacePage = ({
               </div>
             </div>
 
+            {/* Academic Year & Semester Filter */}
+            <div>
+              <div style={{ fontSize: '0.76rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                Academic Year & Semester
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                <button
+                  type="button"
+                  className="quick-chip"
+                  style={{
+                    background: selectedSemester === '' ? 'var(--text-primary)' : 'var(--bg-secondary)',
+                    color: selectedSemester === '' ? 'var(--bg-surface)' : 'var(--text-secondary)',
+                    borderColor: selectedSemester === '' ? 'var(--text-primary)' : 'var(--border-subtle)'
+                  }}
+                  onClick={() => {
+                    setSelectedSemester('');
+                    setCurrentPage(1);
+                    fetchBooks({ semester: '', page: 1 });
+                  }}
+                >
+                  All Years
+                </button>
+                {[
+                  { label: '1st Year (Sem 1-2)', value: 'sem_1_2' },
+                  { label: '2nd Year (Sem 3-4)', value: 'sem_3_4' },
+                  { label: '3rd Year (Sem 5-6)', value: 'sem_5_6' },
+                  { label: 'Final Year & GATE', value: 'final_gate' }
+                ].map((sem) => (
+                  <button
+                    key={sem.value}
+                    type="button"
+                    className="quick-chip"
+                    style={{
+                      background: selectedSemester === sem.value ? 'var(--text-primary)' : 'var(--bg-secondary)',
+                      color: selectedSemester === sem.value ? 'var(--bg-surface)' : 'var(--text-secondary)',
+                      borderColor: selectedSemester === sem.value ? 'var(--text-primary)' : 'var(--border-subtle)'
+                    }}
+                    onClick={() => {
+                      const nextSem = selectedSemester === sem.value ? '' : sem.value;
+                      setSelectedSemester(nextSem);
+                      setCurrentPage(1);
+                      fetchBooks({ semester: nextSem, page: 1 });
+                    }}
+                  >
+                    {sem.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Price Filter in INR */}
             <div>
               <div style={{ fontSize: '0.76rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
@@ -572,8 +635,44 @@ export const MarketplacePage = ({
                 color: 'var(--text-muted)'
               }}
             >
-              <div>
-                Showing <strong>{books.length}</strong> of <strong>{total}</strong> books
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <span>Showing <strong>{books.length}</strong> of <strong>{total}</strong> books</span>
+                {selectedSemester && (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      padding: '0.2rem 0.55rem',
+                      background: 'var(--bg-secondary)',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.76rem',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--border-subtle)'
+                    }}
+                  >
+                    <span>
+                      {selectedSemester === 'sem_1_2'
+                        ? '1st Year (Sem 1-2)'
+                        : selectedSemester === 'sem_3_4'
+                        ? '2nd Year (Sem 3-4)'
+                        : selectedSemester === 'sem_5_6'
+                        ? '3rd Year (Sem 5-6)'
+                        : 'Final Year & GATE'}
+                    </span>
+                    <button
+                      type="button"
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 0, fontSize: '0.9rem', lineHeight: 1 }}
+                      onClick={() => {
+                        setSelectedSemester('');
+                        fetchBooks({ semester: '', page: 1 });
+                      }}
+                      title="Clear year filter"
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
               </div>
             </div>
 
@@ -757,8 +856,8 @@ export const MarketplacePage = ({
                                 border: '1px solid rgba(255, 255, 255, 0.1)'
                               }}
                             >
-                              <span style={{ fontSize: '0.8rem' }}>
-                                {book.title.length > 28 ? book.title.substring(0, 28) + '...' : book.title}
+                              <span className="shelf-spine-title" style={{ fontSize: '0.8rem' }}>
+                                {displayTitle}
                               </span>
                               <span className="shelf-spine-author">
                                 {displayAuthor}

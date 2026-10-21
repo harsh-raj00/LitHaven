@@ -17,7 +17,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
-export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearchQuery }) => {
+export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearchQuery, categoryFilter, setCategoryFilter }) => {
   const [featuredBooks, setFeaturedBooks] = useState([]);
   const [topResources, setTopResources] = useState(INITIAL_RESOURCES);
   const [searchInput, setSearchInput] = useState('');
@@ -51,18 +51,41 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
   const handleHeroSearch = (e) => {
     e.preventDefault();
     if (searchInput.trim()) {
-      setSearchQuery(searchInput.trim());
+      if (setCategoryFilter) setCategoryFilter('');
+      if (setSearchQuery) setSearchQuery(searchInput.trim());
       setCurrentView('marketplace');
     }
   };
 
+  const POPULAR_SUBJECT_MAP = {
+    'Engineering & Tech': 'Engineering & Technology',
+    'Quantitative Finance': 'Commerce, Finance & MBA',
+    'Computer Science': 'Computer Science & AI',
+    'Machine Learning': 'Machine Learning & AI',
+    'Competitive Exams': 'Competitive Exams'
+  };
+
   const handleCategoryClick = (category) => {
-    setSearchQuery(category);
+    const mappedCategory = POPULAR_SUBJECT_MAP[category] || category;
+    if (setSearchQuery) setSearchQuery('');
+    if (setCategoryFilter) setCategoryFilter(mappedCategory);
     setCurrentView('marketplace');
   };
 
-  // Filter books by tab
+  // Filter books by tab (Semester/Year-wise and Subject disciplines)
   const displayedBooks = featuredBooks.filter((book) => {
+    if (activeTab === 'sem_1_2') {
+      return /Semester\s*[12]|Year\s*1|All Semesters/i.test(book.semester || '');
+    }
+    if (activeTab === 'sem_3_4') {
+      return /Semester\s*[34]|Year\s*2/i.test(book.semester || '');
+    }
+    if (activeTab === 'sem_5_6') {
+      return /Semester\s*[56]|Year\s*3/i.test(book.semester || '');
+    }
+    if (activeTab === 'final_gate') {
+      return /Final|GATE|Semester\s*[678]|Pre-Final/i.test(book.semester || '');
+    }
     if (activeTab === 'engineering') {
       return ['Engineering & Technology', 'Natural Sciences & Math'].includes(book.category);
     }
@@ -77,9 +100,6 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
     }
     if (activeTab === 'exams') {
       return ['Competitive Exams'].includes(book.category);
-    }
-    if (activeTab === 'savings') {
-      return book.originalPrice && (book.originalPrice - book.price) > 500;
     }
     return true;
   });
@@ -131,8 +151,8 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
                 Buy, sell, and share textbooks with fellow students. Discover useful study notes, prepare for exams, and make learning more affordable.
               </p>
 
-              {/* Integrated Editorial Search Station */}
-              {/* <form onSubmit={handleHeroSearch} className="hero-search-box" style={{ width: '100%' }}>
+              {/* Integrated Editorial Search Station (Commented out per request)
+              <form onSubmit={handleHeroSearch} className="hero-search-box" style={{ width: '100%' }}>
                 <Search size={19} style={{ color: 'var(--accent-sage)', flexShrink: 0 }} />
                 <input
                   type="text"
@@ -162,10 +182,11 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
                   <span>Find Books</span>
                   <ArrowRight size={15} />
                 </button>
-              </form> */}
+              </form>
+              */}
 
-              {/* Quick Subject Chips & Learn More */}
-              {/* <div className="hero-quick-row">
+              {/* Quick Subject Chips & Learn More (Commented out per request)
+              <div className="hero-quick-row">
                 <span className="hero-quick-label">POPULAR:</span>
                 {[
                   'Engineering & Tech',
@@ -200,7 +221,8 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
                 >
                   Learn More ↓
                 </button>
-              </div> */}
+              </div>
+              */}
             </div>
 
             {/* Right: Interactive 3D Animated Editorial Book Stack */}
@@ -262,12 +284,13 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
               >
                 {[
                   { id: 'all', label: 'All Volumes' },
+                  { id: 'sem_3_4', label: '2nd Year (Sem 3-4)' },
+                  { id: 'sem_5_6', label: '3rd Year (Sem 5-6)' },
+                  { id: 'final_gate', label: 'Final Year & GATE' },
                   { id: 'engineering', label: 'Engineering' },
-                  { id: 'finance', label: 'Finance' },
                   { id: 'cs_ml', label: 'CS & AI' },
-                  { id: 'dev_interview', label: 'Dev & Interview' },
-                  { id: 'exams', label: 'Exams' },
-                  { id: 'savings', label: 'Top Savings' }
+                  { id: 'dev_interview', label: 'Dev & SDE' },
+                  { id: 'exams', label: 'Competitive Exams' }
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -315,6 +338,18 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
           {loading ? (
             <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-muted)' }}>
               Consulting campus catalog...
+            </div>
+          ) : displayedBooks.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3.5rem 1rem', color: 'var(--text-muted)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+              <p style={{ margin: 0, fontWeight: 500 }}>No volumes found under this category tab right now.</p>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                style={{ marginTop: '0.85rem' }}
+                onClick={() => setActiveTab('all')}
+              >
+                View All Featured Volumes
+              </button>
             </div>
           ) : homeViewMode === 'shelf' ? (
             /* Visual 3D Bookshelf View */

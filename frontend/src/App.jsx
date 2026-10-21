@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ToastProvider } from './context/ToastContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastContainer } from './components/ToastContainer';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -16,6 +16,7 @@ import { InquiriesPage } from './pages/InquiriesPage';
 import { DashboardPage } from './pages/DashboardPage';
 
 function AppContent() {
+  const { openAuthModal } = useAuth();
   const [currentView, setCurrentView] = useState(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.replace('#', '');
@@ -30,17 +31,25 @@ function AppContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
 
-  // Sync hash changes with currentView
+  // Sync hash changes with currentView & open AuthModal on #login / #register
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['home', 'marketplace', 'vault', 'sell', 'inquiries', 'dashboard'].includes(hash)) {
+      if (hash === 'login' || hash === 'register') {
+        openAuthModal(hash);
+      } else if (['home', 'marketplace', 'vault', 'sell', 'inquiries', 'dashboard'].includes(hash)) {
         setCurrentView(hash);
       }
     };
+
+    const initialHash = window.location.hash.replace('#', '');
+    if (initialHash === 'login' || initialHash === 'register') {
+      openAuthModal(initialHash);
+    }
+
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  }, [openAuthModal]);
 
   // Global Keyboard Shortcut (⌘K or Ctrl+K) to focus search/marketplace
   useEffect(() => {

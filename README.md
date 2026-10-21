@@ -104,13 +104,13 @@ Each academic volume features original 3D hardcover artwork generated specifical
 </td>
 
 <td width="25%" align="center">
-<img src="./assets/covers/cover_neural.jpg" width="100%" style="border-radius: 8px;" alt="Neural Architectures" />
+<img src="./assets/covers/cover_ai_russell_norvig.jpg" width="100%" style="border-radius: 8px;" alt="Artificial Intelligence: A Modern Approach" />
 <br/>
-<strong>Neural Architectures</strong>
+<strong>Artificial Intelligence (AIMA)</strong>
 <br/>
-<sub>Dr. Eleanor Vance</sub>
+<sub>Russell & Norvig</sub>
 <br/>
-<small><em>AI & Deep Learning</em></small>
+<small><em>AI & Intelligent Agents</em></small>
 </td>
 
 <td width="25%" align="center">
@@ -146,11 +146,11 @@ Each academic volume features original 3D hardcover artwork generated specifical
 </td>
 
 <td width="25%" align="center">
-<img src="./assets/covers/cover_cybernetics.jpg" width="100%" style="border-radius: 8px;" alt="Cybernetic Systems" />
+<img src="./assets/covers/cover_control_systems_nise.jpg" width="100%" style="border-radius: 8px;" alt="Control Systems Engineering" />
 <br/>
-<strong>Cybernetic Systems</strong>
+<strong>Control Systems</strong>
 <br/>
-<sub>Advanced Tech Press</sub>
+<sub>Norman S. Nise</sub>
 <br/>
 <small><em>Robotics & Controls</em></small>
 </td>

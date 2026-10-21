@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
+import { formatINR } from '../utils/formatters';
 import { Heart, MapPin, Sparkles, Eye, ArrowUpRight } from 'lucide-react';
 
 export const BookCard = ({ book, onSelect, onInquire }) => {
@@ -51,10 +52,15 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
     }
   };
 
-  // Calculate discount percentage
+  // Calculate discount percentage and savings
   const discountPercent =
     book.originalPrice && book.originalPrice > book.price
       ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100)
+      : null;
+
+  const savingsAmount =
+    book.originalPrice && book.originalPrice > book.price
+      ? Math.round(book.originalPrice - book.price)
       : null;
 
   return (
@@ -105,8 +111,8 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
               zIndex: 4,
               background: 'rgba(10, 14, 24, 0.85)',
               backdropFilter: 'blur(8px)',
-              border: '1px solid var(--border-gold)',
-              color: 'var(--text-gold)',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--accent-amber)',
               fontSize: '0.68rem',
               fontWeight: 700,
               padding: '0.2rem 0.5rem',
@@ -130,13 +136,13 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
               color: '#ffffff',
               fontSize: '0.72rem',
               fontWeight: 800,
-              padding: '0.22rem 0.6rem',
+              padding: '0.24rem 0.65rem',
               borderRadius: '999px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
               fontFamily: 'var(--font-mono)'
             }}
           >
-            SAVE {discountPercent}%
+            {savingsAmount ? `Save ${formatINR(savingsAmount)} (${discountPercent}%)` : `Save ${discountPercent}%`}
           </div>
         )}
 
@@ -172,7 +178,7 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
             marginBottom: '0.8rem'
           }}
         >
-          <MapPin size={13} color="var(--accent-gold)" />
+          <MapPin size={13} color="var(--accent-terracotta)" />
           <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {book.campusMeetingSpot || book.owner?.college || 'Campus Quad'}
           </span>
@@ -181,9 +187,9 @@ export const BookCard = ({ book, onSelect, onInquire }) => {
         {/* Price & Action Footer */}
         <div className="book-card-footer">
           <div className="book-price-box">
-            <span className="book-price-current font-mono">${book.price}</span>
+            <span className="book-price-current font-mono">{formatINR(book.price)}</span>
             {book.originalPrice > book.price && (
-              <span className="book-price-original font-mono">${book.originalPrice}</span>
+              <span className="book-price-original font-mono">MRP {formatINR(book.originalPrice)}</span>
             )}
           </div>
 

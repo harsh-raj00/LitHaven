@@ -84,14 +84,14 @@ export const Footer = ({ setCurrentView }) => {
               </button>
             </div>
 
-            <button
+            {/* <button
               type="button"
               className="footer-back-to-top"
               onClick={scrollToTop}
               title="Return to top of page"
             >
               Back to Top <ArrowUp size={13} />
-            </button>
+            </button> */}
           </div>
         </div>
       </footer>

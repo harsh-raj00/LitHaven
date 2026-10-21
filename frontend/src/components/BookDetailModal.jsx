@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
+import { formatINR } from '../utils/formatters';
 import {
   X,
   Heart,
@@ -83,9 +84,10 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
           maxWidth: '880px',
           padding: '2.5rem',
           borderRadius: 'var(--radius-xl)',
-          border: '1px solid var(--border-gold)',
+          border: '1px solid var(--border-medium)',
           boxShadow: 'var(--shadow-lg)',
-          background: 'radial-gradient(circle at 10% 10%, rgba(212, 175, 55, 0.08) 0%, var(--bg-glass-heavy) 100%)'
+          background: 'var(--bg-surface)',
+          color: 'var(--text-primary)'
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -110,7 +112,7 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
                 height: '420px',
                 borderRadius: '8px 16px 16px 8px',
                 overflow: 'hidden',
-                background: '#0d111a',
+                background: 'var(--bg-secondary)',
                 border: '1px solid var(--border-subtle)',
                 position: 'relative',
                 boxShadow: 'var(--shadow-book)'
@@ -151,13 +153,13 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
                     color: '#fff',
                     fontWeight: 800,
                     fontSize: '0.78rem',
-                    padding: '0.25rem 0.75rem',
+                    padding: '0.28rem 0.8rem',
                     borderRadius: '999px',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
                     zIndex: 4
                   }}
                 >
-                  SAVE ${savingsAmount} ({discountPercent}%)
+                  Save {formatINR(savingsAmount)} ({discountPercent}%)
                 </div>
               )}
             </div>
@@ -190,16 +192,17 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
               style={{
                 fontSize: '0.8rem',
                 fontWeight: 800,
-                color: 'var(--accent-gold)',
+                color: 'var(--accent-terracotta)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
-                marginBottom: '0.4rem'
+                marginBottom: '0.4rem',
+                fontFamily: 'var(--font-mono)'
               }}
             >
               {book.category} {book.courseCode && `• ${book.courseCode}`}
             </span>
 
-            <h2 className="font-serif-literary" style={{ fontSize: '1.9rem', marginBottom: '0.4rem', lineHeight: 1.25 }}>
+            <h2 className="font-serif-literary" style={{ fontSize: '1.9rem', marginBottom: '0.4rem', lineHeight: 1.25, color: 'var(--text-primary)' }}>
               {book.title}
             </h2>
             <div style={{ fontSize: '0.98rem', color: 'var(--text-secondary)', marginBottom: '1.4rem' }}>
@@ -211,21 +214,26 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
               style={{
                 display: 'flex',
                 alignItems: 'baseline',
-                gap: '1rem',
-                padding: '1rem 1.4rem',
-                background: 'rgba(255, 255, 255, 0.03)',
+                gap: '1.25rem',
+                padding: '1.1rem 1.4rem',
+                background: 'var(--bg-secondary)',
                 borderRadius: '14px',
-                border: '1px solid var(--border-gold)',
+                border: '1px solid var(--border-subtle)',
                 marginBottom: '1.6rem',
                 flexWrap: 'wrap'
               }}
             >
               <div className="font-mono" style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                ${book.price}
+                {formatINR(book.price)}
               </div>
               {book.originalPrice > book.price && (
-                <div className="font-mono" style={{ fontSize: '1.1rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
-                  Retail MRP: ${book.originalPrice}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                  <div className="font-mono" style={{ fontSize: '1rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                    MRP: {formatINR(book.originalPrice)}
+                  </div>
+                  <div className="font-mono" style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--savings-green)' }}>
+                    Save {formatINR(savingsAmount)} ({discountPercent}%)
+                  </div>
                 </div>
               )}
               <span className="badge badge-good" style={{ marginLeft: 'auto', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -240,16 +248,16 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
               </h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', fontSize: '0.85rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)' }}>
-                  <CheckCircle size={14} color="var(--accent-emerald)" /> Spine Binding: Firm & Intact
+                  <CheckCircle size={14} color="var(--savings-green)" /> Spine Binding: Firm & Intact
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)' }}>
-                  <CheckCircle size={14} color="var(--accent-emerald)" /> Edition: {book.edition || 'Standard'}
+                  <CheckCircle size={14} color="var(--savings-green)" /> Edition: {book.edition || 'Standard'}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)' }}>
-                  <CheckCircle size={14} color="var(--accent-emerald)" /> ISBN: {book.isbn || 'Archival Registered'}
+                  <CheckCircle size={14} color="var(--savings-green)" /> ISBN: {book.isbn || 'Archival Registered'}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)' }}>
-                  <CheckCircle size={14} color="var(--accent-emerald)" /> Term: {book.semester || 'All Semesters'}
+                  <CheckCircle size={14} color="var(--savings-green)" /> Term: {book.semester || 'All Semesters'}
                 </div>
               </div>
             </div>
@@ -264,12 +272,13 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
                   style={{
                     marginTop: '0.75rem',
                     fontSize: '0.86rem',
-                    color: 'var(--accent-gold)',
+                    color: 'var(--badge-good-text)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    background: 'rgba(212, 175, 55, 0.08)',
-                    padding: '0.5rem 0.8rem',
+                    background: 'var(--badge-good-bg)',
+                    border: '1px solid var(--badge-good-border)',
+                    padding: '0.55rem 0.85rem',
                     borderRadius: '8px'
                   }}
                 >
@@ -283,8 +292,8 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
               style={{
                 padding: '1.2rem',
                 borderRadius: '16px',
-                background: 'rgba(124, 58, 237, 0.08)',
-                border: '1px solid rgba(124, 58, 237, 0.25)',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-subtle)',
                 marginTop: 'auto'
               }}
             >
@@ -295,10 +304,10 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
                     `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(book.owner?.name || 'Seller')}`
                   }
                   alt={book.owner?.name}
-                  style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--accent-gold)' }}
+                  style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--border-medium)' }}
                 />
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.98rem' }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.98rem', color: 'var(--text-primary)' }}>
                     {book.owner?.name || 'Verified Scholar'}
                   </div>
                   <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
@@ -332,8 +341,8 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
                   marginBottom: '1.1rem'
                 }}
               >
-                <MapPin size={15} color="var(--accent-gold)" />
-                Quad Meetup: <strong>{book.campusMeetingSpot || book.campusLocation || 'Campus Central Library Quad'}</strong>
+                <MapPin size={15} color="var(--accent-terracotta)" />
+                Quad Meetup: <strong style={{ color: 'var(--text-primary)' }}>{book.campusMeetingSpot || book.campusLocation || 'Campus Central Library Quad'}</strong>
               </div>
 
               {/* Action */}
@@ -353,7 +362,7 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
                   style={{
                     textAlign: 'center',
                     fontSize: '0.88rem',
-                    color: 'var(--accent-gold)',
+                    color: 'var(--text-secondary)',
                     fontWeight: 700,
                     padding: '0.5rem'
                   }}

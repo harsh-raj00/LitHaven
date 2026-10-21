@@ -90,9 +90,19 @@ router.get('/', async (req, res, next) => {
       query.subject = { $regex: subject, $options: 'i' };
     }
 
-    // Semester filter
+    // Semester / Academic Year filter with smart aliases
     if (semester && semester !== 'All' && semester !== '') {
-      query.semester = { $regex: semester, $options: 'i' };
+      if (/^(sem_?1_?2|1st|first)/i.test(semester)) {
+        query.semester = { $regex: /Semester\s*[12]|Year\s*1|All Semesters/i };
+      } else if (/^(sem_?3_?4|2nd|second)/i.test(semester)) {
+        query.semester = { $regex: /Semester\s*[34]|Year\s*2/i };
+      } else if (/^(sem_?5_?6|3rd|third)/i.test(semester)) {
+        query.semester = { $regex: /Semester\s*[56]|Year\s*3/i };
+      } else if (/^(final|gate|4th|fourth|pre-final|sem_?7_?8)/i.test(semester)) {
+        query.semester = { $regex: /Final|GATE|Semester\s*[678]|Pre-Final/i };
+      } else {
+        query.semester = { $regex: semester, $options: 'i' };
+      }
     }
 
     // Price range filter
@@ -196,9 +206,10 @@ router.get('/', async (req, res, next) => {
 // @access  Public
 router.get('/featured', async (req, res, next) => {
   try {
+    const limit = parseInt(req.query.limit, 6) || 8;
     const featured = await Book.find({ status: 'available' })
-      .sort({ views: -1, wishlistCount: -1, createdAt: -1 })
-      .limit(6)
+      .sort({ featured: -1, views: -1, wishlistCount: -1, createdAt: -1 })
+      .limit(limit)
       .populate('owner', 'name college rating avatar');
 
     res.json({

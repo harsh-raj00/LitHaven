@@ -1,19 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { X, Sparkles, LogIn, UserPlus, GraduationCap, Mail, Lock, User, Building, BookOpen } from 'lucide-react';
+import {
+  X,
+  Sparkles,
+  LogIn,
+  UserPlus,
+  GraduationCap,
+  Mail,
+  Lock,
+  User,
+  Building,
+  BookOpen,
+  Eye,
+  EyeOff,
+  ShieldCheck
+} from 'lucide-react';
 
-export const AuthModal = () => {
+export const AuthModal = ({ setCurrentView }) => {
   const { authModalOpen, authModalTab, closeAuthModal, login, register, demoLogin } = useAuth();
   const [tab, setTab] = useState(authModalTab || 'login');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [college, setCollege] = useState('Delhi Technological University');
-  const [department, setDepartment] = useState('Computer Science & Engineering');
+  const [college, setCollege] = useState('');
+  const [department, setDepartment] = useState('');
   const [year, setYear] = useState('2nd Year');
+
+  // Synchronize tab when opened via openAuthModal('register' | 'login')
+  useEffect(() => {
+    if (authModalTab) {
+      setTab(authModalTab);
+    }
+  }, [authModalTab]);
+
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!authModalOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') closeAuthModal();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [authModalOpen, closeAuthModal]);
 
   if (!authModalOpen) return null;
 
@@ -26,6 +58,7 @@ export const AuthModal = () => {
       } else {
         await register({ name, email, password, college, department, year });
       }
+      closeAuthModal();
     } catch {
       // error handled by toast in AuthContext
     } finally {
@@ -37,258 +70,276 @@ export const AuthModal = () => {
     setLoading(true);
     try {
       await demoLogin(persona);
+      closeAuthModal();
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="modal-overlay" onClick={closeAuthModal}>
+    <div
+      className="modal-overlay"
+      onClick={closeAuthModal}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-modal-title"
+    >
       <div
-        className="modal-content"
-        style={{ maxWidth: '480px', padding: '2.2rem' }}
+        className="modal-content auth-modal-box"
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="modal-close-btn" onClick={closeAuthModal} aria-label="Close">
+        <button
+          type="button"
+          className="modal-close-btn"
+          onClick={closeAuthModal}
+          aria-label="Close Authentication Modal"
+        >
           <X size={18} />
         </button>
 
-        <div style={{ textAlign: 'center', marginBottom: '1.8rem' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              padding: '12px',
-              borderRadius: '20px',
-              background: 'radial-gradient(circle at 50% 50%, rgba(217, 119, 6, 0.2), rgba(15, 23, 42, 0.6))',
-              border: '1px solid rgba(217, 119, 6, 0.35)',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
-              marginBottom: '1rem'
-            }}
-          >
-            <BookOpen size={26} color="var(--accent-gold)" />
+        {/* Modal Brand Header */}
+        <div className="auth-modal-header">
+          <div className="auth-modal-icon-badge">
+            <BookOpen size={24} color="var(--accent-terracotta)" />
           </div>
-          <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'var(--accent-gold)', fontWeight: 700, marginBottom: '0.3rem' }}>
-            ACADEMIC CONSORTIUM PORTAL
-          </div>
-          <h2 className="font-serif-literary" style={{ fontSize: '2rem', marginBottom: '0.4rem', fontWeight: 600, letterSpacing: '-0.01em' }}>
+          <span className="auth-form-eyebrow">ACADEMIC CONSORTIUM PORTAL</span>
+          <h2 id="auth-modal-title" className="font-serif-literary auth-modal-title">
             {tab === 'login' ? 'Scholar Authentication' : 'Establish Academic Identity'}
           </h2>
-          <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', maxWidth: '380px', margin: '0 auto' }}>
+          <p className="auth-modal-desc">
             {tab === 'login'
               ? 'Access your collegiate registry, active covenants, and reserved folios.'
               : 'Join a cross-university guild of verified scholars exchanging knowledge.'}
           </p>
         </div>
 
-        {/* Demo 1-Click Persona Bar */}
-        <div
-          style={{
-            background: 'linear-gradient(145deg, rgba(217, 119, 6, 0.08), rgba(15, 23, 42, 0.6))',
-            border: '1px solid rgba(217, 119, 6, 0.22)',
-            borderRadius: '16px',
-            padding: '1.1rem',
-            marginBottom: '1.6rem',
-            position: 'relative'
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: '0.74rem',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              color: 'var(--accent-gold)',
-              marginBottom: '0.75rem'
-            }}
-          >
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <Sparkles size={13} /> Immediate Fellowship Pass
+        {/* Immediate Fellowship Pass Demo Personas (Commented out per request)
+        <div className="auth-demo-box">
+          <div className="auth-demo-header">
+            <span className="auth-demo-tag">
+              <Sparkles size={13} color="var(--accent-terracotta)" />
+              <span>Immediate Fellowship Pass</span>
             </span>
-            <span style={{ fontSize: '0.68rem', opacity: 0.8, textTransform: 'none', color: 'var(--text-muted)' }}>
-              1-Click Verification
-            </span>
+            <span className="auth-demo-hint">1-Click Fast Access</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
+
+          <div className="auth-demo-grid">
             <button
               type="button"
-              className="btn btn-secondary btn-sm"
+              className="auth-demo-btn"
               disabled={loading}
               onClick={() => handleDemo('engineering')}
-              style={{ fontSize: '0.78rem', padding: '0.55rem 0.6rem', justifyContent: 'flex-start', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+              title="Aanya Sharma • CS & AI, DTU"
             >
-              👩‍💻 <span><strong>Aanya</strong> <span style={{ opacity: 0.65, fontSize: '0.72rem' }}>(CS/Eng)</span></span>
+              <span className="auth-demo-emoji">👩‍💻</span>
+              <div className="auth-demo-meta">
+                <strong>Aanya</strong>
+                <span>CS & AI • DTU</span>
+              </div>
             </button>
+
             <button
               type="button"
-              className="btn btn-secondary btn-sm"
+              className="auth-demo-btn"
               disabled={loading}
               onClick={() => handleDemo('medical')}
-              style={{ fontSize: '0.78rem', padding: '0.55rem 0.6rem', justifyContent: 'flex-start', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+              title="Dr. Marcus Vance • Genomics, AIIMS"
             >
-              🩺 <span><strong>Dr. Vance</strong> <span style={{ opacity: 0.65, fontSize: '0.72rem' }}>(Med)</span></span>
+              <span className="auth-demo-emoji">🩺</span>
+              <div className="auth-demo-meta">
+                <strong>Dr. Marcus</strong>
+                <span>Genomics • AIIMS</span>
+              </div>
             </button>
+
             <button
               type="button"
-              className="btn btn-secondary btn-sm"
+              className="auth-demo-btn"
               disabled={loading}
               onClick={() => handleDemo('commerce')}
-              style={{ fontSize: '0.78rem', padding: '0.55rem 0.6rem', justifyContent: 'flex-start', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+              title="Sophia Chen • Finance, Oxford"
             >
-              📊 <span><strong>Sophia</strong> <span style={{ opacity: 0.65, fontSize: '0.72rem' }}>(Finance)</span></span>
+              <span className="auth-demo-emoji">📊</span>
+              <div className="auth-demo-meta">
+                <strong>Sophia</strong>
+                <span>Finance • Oxford</span>
+              </div>
             </button>
+
             <button
               type="button"
-              className="btn btn-secondary btn-sm"
+              className="auth-demo-btn"
               disabled={loading}
               onClick={() => handleDemo('hardware')}
-              style={{ fontSize: '0.78rem', padding: '0.55rem 0.6rem', justifyContent: 'flex-start', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)' }}
+              title="Rohan Deshmukh • Robotics, BITS"
             >
-              ⚡ <span><strong>Rohan</strong> <span style={{ opacity: 0.65, fontSize: '0.72rem' }}>(Math/BITS)</span></span>
+              <span className="auth-demo-emoji">⚡</span>
+              <div className="auth-demo-meta">
+                <strong>Rohan</strong>
+                <span>Robotics • BITS</span>
+              </div>
             </button>
           </div>
         </div>
+        */}
 
-        {/* Tabs toggle */}
-        <div
-          style={{
-            display: 'flex',
-            background: 'rgba(255, 255, 255, 0.05)',
-            padding: '4px',
-            borderRadius: '999px',
-            marginBottom: '1.4rem'
-          }}
-        >
+        {/* High-Contrast Visible Tabs Toggle */}
+        <div className="auth-tabs-toggle">
           <button
             type="button"
+            className={`auth-tab-pill ${tab === 'login' ? 'active' : ''}`}
             onClick={() => setTab('login')}
-            style={{
-              flex: 1,
-              padding: '0.55rem',
-              border: 'none',
-              borderRadius: '999px',
-              fontWeight: 600,
-              fontSize: '0.88rem',
-              cursor: 'pointer',
-              background: tab === 'login' ? 'var(--primary)' : 'transparent',
-              color: tab === 'login' ? '#ffffff' : 'var(--text-secondary)',
-              transition: 'all 0.2s'
-            }}
           >
-            Sign In
+            <LogIn size={15} /> Sign In
           </button>
           <button
             type="button"
+            className={`auth-tab-pill ${tab === 'register' ? 'active' : ''}`}
             onClick={() => setTab('register')}
-            style={{
-              flex: 1,
-              padding: '0.55rem',
-              border: 'none',
-              borderRadius: '999px',
-              fontWeight: 600,
-              fontSize: '0.88rem',
-              cursor: 'pointer',
-              background: tab === 'register' ? 'var(--primary)' : 'transparent',
-              color: tab === 'register' ? '#ffffff' : 'var(--text-secondary)',
-              transition: 'all 0.2s'
-            }}
           >
-            Create Account
+            <UserPlus size={15} /> Create Account
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit}>
+        {/* Modal Form */}
+        <form onSubmit={handleSubmit} className="auth-main-form">
           {tab === 'register' && (
             <>
               <div className="form-group">
-                <label className="form-label">Full Name</label>
-                <div style={{ position: 'relative' }}>
+                <label className="form-label">Full Name *</label>
+                <div className="form-input-icon-wrap">
+                  <User size={16} className="form-leading-icon" />
                   <input
                     type="text"
                     required
-                    className="form-input"
-                    placeholder="e.g. Maya Iyer"
+                    className="form-input form-input-with-icon"
+                    placeholder="e.g. Rahul Sharma"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <div className="auth-dual-grid">
                 <div className="form-group">
-                  <label className="form-label">College / University</label>
+                  <label className="form-label">Collegiate Institute *</label>
+                  <div className="form-input-icon-wrap">
+                    <Building size={16} className="form-leading-icon" />
+                    <input
+                      type="text"
+                      required
+                      className="form-input form-input-with-icon"
+                      placeholder="e.g. Delhi Technological University"
+                      value={college}
+                      onChange={(e) => setCollege(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Academic Year *</label>
+                  <div className="form-input-icon-wrap">
+                    <GraduationCap size={16} className="form-leading-icon" />
+                    <select
+                      className="form-select form-input-with-icon"
+                      value={year}
+                      onChange={(e) => setYear(e.target.value)}
+                    >
+                      <option value="1st Year">1st Year (Freshman)</option>
+                      <option value="2nd Year">2nd Year (Sophomore)</option>
+                      <option value="3rd Year">3rd Year (Junior)</option>
+                      <option value="Final Year">Final Year (Senior)</option>
+                      <option value="Postgraduate">Postgraduate</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Academic Department *</label>
+                <div className="form-input-icon-wrap">
+                  <BookOpen size={16} className="form-leading-icon" />
                   <input
                     type="text"
-                    className="form-input"
-                    value={college}
-                    onChange={(e) => setCollege(e.target.value)}
+                    required
+                    className="form-input form-input-with-icon"
+                    placeholder="e.g. Computer Science & Engineering"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
                   />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Academic Year</label>
-                  <select
-                    className="form-select"
-                    value={year}
-                    onChange={(e) => setYear(e.target.value)}
-                  >
-                    <option value="1st Year">1st Year</option>
-                    <option value="2nd Year">2nd Year</option>
-                    <option value="3rd Year">3rd Year</option>
-                    <option value="Final Year">Final Year</option>
-                    <option value="Postgraduate">Postgraduate</option>
-                  </select>
                 </div>
               </div>
             </>
           )}
 
+          {/* Email Address */}
           <div className="form-group">
-            <label className="form-label">Email Address</label>
-            <input
-              type="email"
-              required
-              className="form-input"
-              placeholder="student@university.edu"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <label className="form-label">Email Address *</label>
+            <div className="form-input-icon-wrap">
+              <Mail size={16} className="form-leading-icon" />
+              <input
+                type="email"
+                required
+                className="form-input form-input-with-icon"
+                placeholder="student@university.edu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
           </div>
 
+          {/* Password with Eye Toggle */}
           <div className="form-group">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              className="form-input"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <label className="form-label">Password *</label>
+            <div className="form-input-icon-wrap">
+              <Lock size={16} className="form-leading-icon" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                minLength={6}
+                className="form-input form-input-with-icon"
+                style={{ paddingRight: '2.5rem' }}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="form-trailing-btn"
+                onClick={() => setShowPassword((prev) => !prev)}
+                title={showPassword ? 'Hide password' : 'Show password'}
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
+          {/* Submit CTA */}
           <button
             type="submit"
-            className="btn btn-primary"
+            className="btn btn-primary auth-submit-btn"
             disabled={loading}
-            style={{ width: '100%', marginTop: '0.6rem', padding: '0.85rem' }}
           >
             {loading ? (
-              'Processing...'
+              'Verifying Credentials...'
             ) : tab === 'login' ? (
               <>
-                <LogIn size={18} /> Sign In
+                <LogIn size={17} /> Inscribe & Enter Stacks
               </>
             ) : (
               <>
-                <UserPlus size={18} /> Join LitHaven
+                <UserPlus size={17} /> Register Collegiate Identity
               </>
             )}
           </button>
         </form>
+
+        {/* Modal Footer Assurance */}
+        <div className="auth-footer-honor">
+          <ShieldCheck size={14} color="var(--savings-green)" />
+          <span>Protected under LitHaven’s Academic Honor Code & Zero-Fee Charter.</span>
+        </div>
       </div>
     </div>
   );
