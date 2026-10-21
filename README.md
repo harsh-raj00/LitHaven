@@ -2,12 +2,12 @@
 
 # 🏛️ LitHaven
 
-### *The Premier Campus Academic Book Exchange & Study Sanctuary*
+### *A Simple College Book Exchange & Study Notes Sharing Platform*
 
-[![MongoDB](https://img.shields.io/badge/MongoDB-8.x-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com)
-[![Express](https://img.shields.io/badge/Express.js-4.19-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
-[![React](https://img.shields.io/badge/React-19.x-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
-[![Node.js](https://img.shields.io/badge/Node.js-24.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com)
+[![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io)
 [![Vite](https://img.shields.io/badge/Vite-Fast-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
@@ -15,60 +15,59 @@
 <br/>
 
 <p align="center">
-  <img src="./assets/banner.jpg" alt="LitHaven Academic Atelier Hero Banner" width="100%" style="border-radius: 14px; box-shadow: 0 12px 36px rgba(0,0,0,0.6);" />
+  <img src="./assets/banner.jpg" alt="LitHaven Hero Banner" width="100%" style="border-radius: 14px; box-shadow: 0 12px 36px rgba(0,0,0,0.6);" />
 </p>
 
-**LitHaven** is a complete, full-stack **MERN** application engineered for university students to **buy, sell, and exchange academic textbooks** and **share verified study resources** (formula cheat sheets, revision notes, and end-semester solved question papers) in a trusted peer-to-peer campus network with zero commission fees.
+**LitHaven** is a complete, full-stack **MERN** application built for college students to **buy and sell used books** and **share study notes** (cheat sheets, lecture summaries, and solved question papers) with classmates on campus with zero commission fees.
 
-[🚀 Quick Start](#-quick-start) · [📡 API Reference](#-api-reference) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models) · [🎨 Design System](#-visual-identity--ux) · [📚 Monograph Gallery](#-bespoke-monograph-gallery)
+[🚀 Quick Start](#-quick-start) · [📡 API Reference](#-api-reference) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models) · [🎨 Design](#-visual-identity--ux) · [📚 Books Gallery](#-books-gallery)
 
 ---
 
 </div>
 
-## ✨ Key Features & Upgrades
+## ✨ Key Features
 
 <table>
 <tr>
 <td width="50%">
 
-### 📖 The Codex Exchange
-- **Real-Time Live Preview Studio**: Sellers see their monograph card render live as they type title, condition, and price.
-- **Smart Discount Engine**: Automatically calculates savings percentage against original retail MRP.
-- **Multi-Facet Search & Filters**: Search across titles, authors, course codes, and ISBNs. Filter by academic category, condition grade, and price sliders.
-- **Campus Meetup Verification**: Specific physical campus meeting spots (Library, Quad, Student Canteen).
-- **Curated Academic Presets**: Instant cover selection for top standard textbooks (CLRS Algorithms, Gray's Anatomy, Kurose Networks, Dinosaur OS, Kreyszig Maths, etc.) or custom image upload.
+### 📖 Find & Sell Books
+- **Live Preview**: See your book card update in real-time as you type title, condition, and price.
+- **Smart Savings Calculator**: Shows exact discounts compared to original retail prices.
+- **Easy Search & Filters**: Search across titles, authors, and subjects. Filter by condition and price in ₹.
+- **Campus Meeting Spots**: Pick safe spots to meet on campus (Library, Canteen, Student Center).
+- **Popular Textbook Covers**: Instant cover presets for standard books or upload your own photo.
 
 </td>
 <td width="50%">
 
-### 📝 The Scriptorium
-- **High-Yield Course Material**: Access cheat sheets, lecture summaries, lab manuals, and previous 5-year solved papers.
-- **Instant Download Counter**: Real-time counter tracks resource engagement and community downloads.
-- **Tag-Based Discovery**: Instant filter by courses, subjects, and target semesters.
-- **File Upload & Cloud Links**: Upload PDF files directly or share public cloud links.
-- **Zero Paywalls**: Always free and open for student collaboration.
+### 📝 Study Notes & Question Papers
+- **Helpful Study Materials**: Access formula sheets, class notes, lab manuals, and solved papers.
+- **Download Counter**: See how many students have downloaded each resource.
+- **Quick Filters**: Filter notes by subject and semester.
+- **File Uploads & Links**: Upload PDFs directly or share links.
+- **100% Free**: Always free for student collaboration.
 
 </td>
 </tr>
 <tr>
 <td width="50%">
 
-### 💬 In-App Offers & Campus Handover Chats
-- **Direct Peer-to-Peer Negotiation**: Buyers can propose custom offer prices and suggested meetup times.
-- **Offer Workflow Management**: Sellers can Accept, Decline, or Mark Handover as Completed.
-- **Interactive Conversation Thread**: Real-time messaging hub keeps buyer and seller in sync without sharing private phone numbers.
-- **Automatic Status Sync**: Books update from `available` → `reserved` → `sold` as offers progress.
+### 💬 Offers & Messages
+- **Direct Messaging**: Make offers and chat directly with sellers to arrange a meeting.
+- **Easy Offer Controls**: Sellers can Accept, Decline, or mark orders as Done.
+- **Safe Campus Chat**: Keeps students connected without having to share personal phone numbers.
+- **Automatic Status Updates**: Books update from `available` → `reserved` → `sold`.
 
 </td>
 <td width="50%">
 
-### 🔐 Security & Student Profiles
-- **Stateless JWT Authentication**: Secure HTTP bearer tokens with configurable expiration.
-- **Bcrypt Password Encryption**: Industry standard 10-round salting.
-- **1-Click Demo Accounts**: Instant evaluation personas (Engineering, Medical, Commerce, Hardware).
-- **Interactive Wishlist**: Save favorite books with one-click heart toggles.
-- **Seller Reputation**: 5-star ratings and verified reviews left after handovers.
+### 🔐 Accounts & Profiles
+- **Secure Logins**: Fast and safe token-based sign-in.
+- **1-Click Demo Accounts**: Test immediately with Engineering, Medical, or Business student accounts.
+- **Saved Books**: Bookmark books you like with a single click.
+- **Student Profile**: Manage your active listings, saved books, and uploaded notes in one place.
 
 </td>
 </tr>
@@ -104,13 +103,13 @@ Each academic volume features original 3D hardcover artwork generated specifical
 </td>
 
 <td width="25%" align="center">
-<img src="./assets/covers/cover_ai_russell_norvig.jpg" width="100%" style="border-radius: 8px;" alt="Artificial Intelligence: A Modern Approach" />
+<img src="./assets/covers/cover_neural.jpg" width="100%" style="border-radius: 8px;" alt="Neural Architectures" />
 <br/>
-<strong>Artificial Intelligence (AIMA)</strong>
+<strong>Neural Architectures</strong>
 <br/>
-<sub>Russell & Norvig</sub>
+<sub>Dr. Eleanor Vance</sub>
 <br/>
-<small><em>AI & Intelligent Agents</em></small>
+<small><em>AI & Deep Learning</em></small>
 </td>
 
 <td width="25%" align="center">
@@ -146,11 +145,11 @@ Each academic volume features original 3D hardcover artwork generated specifical
 </td>
 
 <td width="25%" align="center">
-<img src="./assets/covers/cover_control_systems_nise.jpg" width="100%" style="border-radius: 8px;" alt="Control Systems Engineering" />
+<img src="./assets/covers/cover_cybernetics.jpg" width="100%" style="border-radius: 8px;" alt="Cybernetic Systems" />
 <br/>
-<strong>Control Systems</strong>
+<strong>Cybernetic Systems</strong>
 <br/>
-<sub>Norman S. Nise</sub>
+<sub>Advanced Tech Press</sub>
 <br/>
 <small><em>Robotics & Controls</em></small>
 </td>
