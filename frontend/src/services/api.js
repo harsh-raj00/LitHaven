@@ -154,6 +154,17 @@ export const api = {
       });
       return handleResponse(res);
     },
+    toggleLike: async (id, isLiked = false, currentUpvotes = 0) => {
+      const res = await fetch(`${BASE_URL}/api/resources/${id}/like`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          action: isLiked ? 'unlike' : 'like',
+          currentUpvotes
+        })
+      });
+      return handleResponse(res);
+    },
     create: async (formData) => {
       const isForm = formData instanceof FormData;
       const res = await fetch(`${BASE_URL}/api/resources`, {

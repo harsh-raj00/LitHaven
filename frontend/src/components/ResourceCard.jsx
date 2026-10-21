@@ -1,217 +1,442 @@
 import React, { useState } from 'react';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
-import { FileText, Download, Check, GraduationCap, Tag, Sparkles } from 'lucide-react';
+import {
+  FileText,
+  Download,
+  Check,
+  Heart,
+  Eye,
+  X,
+  GraduationCap,
+  Sparkles,
+  Share2,
+  ArrowUpRight
+} from 'lucide-react';
 
 export const ResourceCard = ({ resource }) => {
   const [downloadCount, setDownloadCount] = useState(resource.downloadCount || 0);
-  const [downloading, setDownloading] = useState(false);
-  const { showToast } = useToast();
 
-  const handleDownload = async () => {
-    setDownloading(true);
+  const getInitialLiked = () => {
     try {
-      const data = await api.resources.download(resource._id);
-      if (data.success) {
-        setDownloadCount(data.downloadCount);
-        showToast(`Downloaded "${resource.title}"`, 'success');
-
-        // Trigger browser download simulation
-        const link = document.createElement('a');
-        link.href = data.downloadUrl || '/covers/cover_quantum.jpg';
-        link.download = resource.fileName || 'study_notes.pdf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    } catch (err) {
-      showToast(err.message || 'Download failed', 'error');
-    } finally {
-      setTimeout(() => setDownloading(false), 1200);
+      const raw = localStorage.getItem('lithaven_liked_resources');
+      const likedList = raw ? JSON.parse(raw) : [];
+      return likedList.includes(resource._id);
+    } catch (e) {
+      return false;
     }
   };
 
-  const getFileTypeColor = (type) => {
-    switch (type) {
-      case 'Cheat Sheet':
-        return '#f59e0b';
-      case 'Question Paper':
-        return '#06b6d4';
-      case 'Notes':
-        return '#818cf8';
-      case 'Presentation':
-        return '#a855f7';
-      default:
-        return '#10b981';
+  const [isLiked, setIsLiked] = useState(getInitialLiked);
+  const [upvotes, setUpvotes] = useState(resource.upvotes || 0);
+  const [downloading, setDownloading] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const { showToast } = useToast();
+
+  const categoryColor = 'var(--accent-terracotta)';
+
+  const getResourcePdfUrl = () => {
+    if (resource.fileUrl) return resource.fileUrl;
+    const t = (resource.title || '').toLowerCase();
+    if (t.includes('dsa') || t.includes('leetcode')) return '/notes/dsa_leetcode_150_cheatsheet.pdf';
+    if (t.includes('gate')) return '/notes/gate_cs_solved_question_bank.pdf';
+    if (t.includes('aptitude') || t.includes('quantitative')) return '/notes/quantitative_aptitude_speed_math.pdf';
+    if (t.includes('operating') || t.includes('dbms')) return '/notes/operating_systems_dbms_capsule.pdf';
+    if (t.includes('machine learning') || t.includes('ml')) return '/notes/machine_learning_math_formulas.pdf';
+    if (t.includes('system design')) return '/notes/system_design_hld_handbook.pdf';
+    if (t.includes('full-stack') || t.includes('web')) return '/notes/fullstack_react19_architecture.pdf';
+    if (t.includes('transformer')) return '/notes/machine_learning_math_formulas.pdf';
+    return '/notes/dsa_leetcode_150_cheatsheet.pdf';
+  };
+
+  const handleLikeToggle = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
     }
+    const nextLiked = !isLiked;
+    const nextUpvotes = Math.max(0, upvotes + (nextLiked ? 1 : -1));
+
+    // Optimistic UI updates
+    setIsLiked(nextLiked);
+    setUpvotes(nextUpvotes);
+
+    // Persist in localStorage
+    try {
+      const raw = localStorage.getItem('lithaven_liked_resources');
+      const likedList = raw ? JSON.parse(raw) : [];
+      let updatedList;
+      if (nextLiked) {
+        updatedList = Array.from(new Set([...likedList, resource._id]));
+      } else {
+        updatedList = likedList.filter((id) => id !== resource._id);
+      }
+      localStorage.setItem('lithaven_liked_resources', JSON.stringify(updatedList));
+    } catch (err) {
+      console.warn('LocalStorage error:', err);
+    }
+
+    showToast(nextLiked ? `Added to liked resources` : `Removed like`, 'info');
+
+    // Sync with backend API
+    try {
+      const res = await api.resources.toggleLike(resource._id, isLiked, upvotes);
+      if (res && typeof res.upvotes === 'number') {
+        setUpvotes(res.upvotes);
+      }
+    } catch (err) {
+      console.warn('Like sync error:', err);
+    }
+  };
+
+  const handleDownload = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setDownloading(true);
+    const pdfUrl = getResourcePdfUrl();
+    const downloadName = resource.fileName || `${(resource.title || 'study_notes').toLowerCase().replace(/[^a-z0-9]/g, '_')}.pdf`;
+
+    try {
+      const data = await api.resources.download(resource._id);
+      if (data && data.success) {
+        setDownloadCount(data.downloadCount || (downloadCount + 1));
+      } else {
+        setDownloadCount((prev) => prev + 1);
+      }
+      showToast(`Downloading "${getDisplayTitle()}"...`, 'success');
+
+      // Trigger browser download
+      const link = document.createElement('a');
+      link.href = data?.downloadUrl || pdfUrl;
+      link.download = downloadName;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      setDownloadCount((prev) => prev + 1);
+      showToast(`Downloading "${getDisplayTitle()}"...`, 'success');
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = downloadName;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } finally {
+      setTimeout(() => setDownloading(false), 1000);
+    }
+  };
+
+  const getCategoryLabel = () => {
+    const t = resource.title || '';
+    const cat = resource.category || '';
+    if (t.includes('GATE CS & IT')) return 'COMPETITIVE EXAMS • PDF';
+    if (t.includes('Quantitative Aptitude')) return 'COMPETITIVE EXAMS • PDF';
+    if (t.includes('DSA & LeetCode') || t.includes('DSA Revision')) return 'CS & ALGORITHMS • NOTES';
+    if (t.includes('Operating Systems & DBMS')) return 'INTERVIEW PREP • NOTES';
+    if (t.includes('Machine Learning & Deep Learning Mathematics') || t.includes('ML Mathematics')) return 'MACHINE LEARNING • NOTES';
+    if (t.includes('System Design')) return 'INTERVIEW PREP • HANDBOOK';
+    if (t.includes('Full-Stack Web')) return 'WEB DEV • REFERENCE';
+    if (t.includes('Transformer Attention')) return 'MACHINE LEARNING • NOTES';
+
+    const fileType = resource.fileType?.toUpperCase() || 'NOTES';
+    if (cat.includes('Competitive')) return `COMPETITIVE EXAMS • ${fileType === 'QUESTION PAPER' ? 'PDF' : fileType}`;
+    if (cat.includes('Machine Learning')) return `MACHINE LEARNING • ${fileType}`;
+    if (cat.includes('Interview')) return `INTERVIEW PREP • ${fileType}`;
+    if (cat.includes('Software Development')) return `INTERVIEW PREP • HANDBOOK`;
+    if (cat.includes('Computer Science')) return `CS & ALGORITHMS • ${fileType}`;
+    return `${cat.toUpperCase()} • ${fileType}`;
+  };
+
+  const getDisplayTitle = () => {
+    const t = resource.title || '';
+    if (t.includes('GATE CS & IT')) return 'GATE CS & IT Question Bank';
+    if (t.includes('Quantitative Aptitude')) return 'Quantitative Aptitude Formula Sheet';
+    if (t.includes('DSA & LeetCode')) return 'DSA Revision Guide';
+    if (t.includes('Operating Systems & DBMS')) return 'Operating Systems & DBMS';
+    if (t.includes('Machine Learning & Deep Learning Mathematics')) return 'ML Mathematics Revision';
+    if (t.includes('System Design & High-Level Architecture')) return 'System Design Fundamentals';
+    if (t.includes('Full-Stack Web Development')) return 'Full-Stack Web Engineering';
+    if (t.includes('Transformer Attention Mechanisms')) return 'Transformer Attention Mechanisms';
+    return t;
+  };
+
+  const getDisplaySubject = () => {
+    const t = resource.title || '';
+    if (t.includes('GATE CS & IT')) return 'Computer Science • Exam Preparation';
+    if (t.includes('Quantitative Aptitude')) return 'Aptitude • Placements & CAT';
+    if (t.includes('DSA & LeetCode')) return 'Algorithms • Coding Practice';
+    if (t.includes('Operating Systems & DBMS')) return 'Technical Interviews';
+    if (t.includes('Machine Learning & Deep Learning Mathematics')) return 'Machine Learning • Deep Learning';
+    if (t.includes('System Design & High-Level Architecture')) return 'Software Engineering • Placements';
+    if (t.includes('Full-Stack Web Development')) return 'Software Engineering • Web Dev';
+    if (t.includes('Transformer Attention Mechanisms')) return 'Deep Learning • Attention Models';
+    return `${resource.subject || 'Academic'} • ${resource.semester || 'Notes'}`;
+  };
+
+  const getDisplayDesc = () => {
+    const t = resource.title || '';
+    if (t.includes('GATE CS & IT')) {
+      return 'Practice previous-year questions covering algorithms, operating systems, databases, and networks.';
+    }
+    if (t.includes('Quantitative Aptitude')) {
+      return 'Revise percentages, profit and loss, time and work, and essential mental math shortcuts.';
+    }
+    if (t.includes('DSA & LeetCode')) {
+      return 'Understand arrays, trees, graphs, sliding windows, recursion, and dynamic programming.';
+    }
+    return resource.description;
   };
 
   return (
-    <div
-      className="glass-card"
-      style={{
-        padding: '1.6rem',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        position: 'relative',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-subtle)',
-        background: 'linear-gradient(180deg, var(--bg-card) 0%, rgba(10, 14, 24, 0.95) 100%)'
-      }}
-    >
-      {/* Archival Left Accent Border */}
+    <>
       <div
-        style={{
-          position: 'absolute',
-          top: '16px',
-          bottom: '16px',
-          left: 0,
-          width: '3px',
-          background: getFileTypeColor(resource.fileType),
-          borderRadius: '0 4px 4px 0'
-        }}
-      />
-
-      {/* Top Meta */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '1rem'
-        }}
+        className="resource-card"
+        onClick={() => setPreviewOpen(true)}
       >
-        <span
-          className="badge"
-          style={{
-            background: `${getFileTypeColor(resource.fileType)}18`,
-            color: getFileTypeColor(resource.fileType),
-            border: `1px solid ${getFileTypeColor(resource.fileType)}40`,
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-            fontSize: '0.72rem'
-          }}
-        >
-          <FileText size={12} /> {resource.fileType}
-        </span>
-        <span className="font-mono" style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          {resource.fileSize}
-        </span>
+        <div className="resource-card-body-wrap">
+          {/* Header row: Category Label + Like Button */}
+          <div className="resource-card-header">
+            <span className="resource-card-category">
+              {getCategoryLabel()}
+            </span>
+
+            {/* Like Button (Heart Icon + Counter) */}
+            <button
+              type="button"
+              className={`resource-like-btn ${isLiked ? 'is-liked' : ''}`}
+              onClick={handleLikeToggle}
+              title={isLiked ? 'Unlike resource' : 'Like resource'}
+              aria-label={isLiked ? `Unlike ${getDisplayTitle()}` : `Like ${getDisplayTitle()}`}
+            >
+              <Heart
+                size={14}
+                className="resource-heart-icon"
+                fill={isLiked ? 'currentColor' : 'none'}
+              />
+              <span className="resource-like-count">{upvotes}</span>
+            </button>
+          </div>
+
+          {/* Large bold dark serif title */}
+          <h3 className="resource-card-title">
+            {getDisplayTitle()}
+          </h3>
+
+          {/* Course / Subject Subtitle */}
+          <div className="resource-card-course">
+            {getDisplaySubject()}
+          </div>
+
+          {/* Concise Description */}
+          <p className="resource-card-desc">
+            {getDisplayDesc()}
+          </p>
+        </div>
+
+        {/* Two Clear Actions: Preview & Download */}
+        <div className="resource-card-actions-row">
+          <button
+            type="button"
+            className="resource-btn-preview"
+            onClick={(e) => {
+              e.stopPropagation();
+              setPreviewOpen(true);
+            }}
+            title="Preview resource before downloading"
+            aria-label={`Preview ${getDisplayTitle()}`}
+          >
+            <Eye size={15} className="resource-action-icon" />
+            <span>Preview</span>
+          </button>
+
+          <button
+            type="button"
+            className={`resource-btn-download ${downloading ? 'is-downloading' : ''}`}
+            onClick={handleDownload}
+            disabled={downloading}
+            title="Download PDF resource"
+            aria-label={`Download ${getDisplayTitle()}`}
+          >
+            <Download size={15} className="resource-action-icon" />
+            <span>{downloading ? 'Saving...' : 'Download'}</span>
+          </button>
+        </div>
       </div>
 
-      {/* Title & Subject */}
-      <h3
-        className="font-serif-literary"
-        style={{
-          fontSize: '1.25rem',
-          fontWeight: 700,
-          marginBottom: '0.45rem',
-          lineHeight: 1.35,
-          color: 'var(--text-primary)',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden'
-        }}
-      >
-        {resource.title}
-      </h3>
+      {/* Interactive Quick Preview Modal */}
+      {previewOpen && (
+        <div className="modal-overlay" onClick={() => setPreviewOpen(false)}>
+          <div
+            className="modal-content"
+            style={{ maxWidth: '640px', padding: '2.25rem' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="modal-close-btn"
+              onClick={() => setPreviewOpen(false)}
+              aria-label="Close"
+            >
+              <X size={18} />
+            </button>
 
-      <div
-        style={{
-          fontSize: '0.82rem',
-          color: 'var(--accent-gold)',
-          fontWeight: 600,
-          marginBottom: '0.7rem'
-        }}
-      >
-        {resource.subject} • {resource.semester}
-      </div>
+            {/* Modal Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+              <span
+                style={{
+                  background: 'var(--bg-secondary)',
+                  color: categoryColor,
+                  border: '1px solid var(--border-subtle)',
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  padding: '0.2rem 0.6rem',
+                  borderRadius: 'var(--radius-xs)',
+                  fontFamily: 'var(--font-mono)'
+                }}
+              >
+                {resource.category}
+              </span>
+              <span className="badge" style={{ fontSize: '0.74rem' }}>
+                <FileText size={12} /> {resource.fileType}
+              </span>
+              <span className="font-mono" style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+                {resource.fileSize || '3.5 MB'}
+              </span>
+            </div>
 
-      <p
-        style={{
-          fontSize: '0.88rem',
-          color: 'var(--text-secondary)',
-          lineHeight: 1.55,
-          marginBottom: '1.2rem',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-          flex: 1
-        }}
-      >
-        {resource.description}
-      </p>
-
-      {/* Tags */}
-      {resource.tags && resource.tags.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginBottom: '1.2rem' }}>
-          {resource.tags.slice(0, 3).map((tag, idx) => (
-            <span
-              key={idx}
+            <h2
               style={{
-                fontSize: '0.74rem',
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid var(--border-subtle)',
-                color: 'var(--text-secondary)',
-                padding: '0.18rem 0.55rem',
-                borderRadius: '6px',
-                fontFamily: 'var(--font-mono)'
+                fontFamily: 'var(--font-heading)',
+                fontSize: '1.45rem',
+                fontWeight: 700,
+                lineHeight: 1.25,
+                color: 'var(--text-primary)',
+                marginBottom: '0.5rem'
               }}
             >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      )}
+              {resource.title}
+            </h2>
 
-      {/* Footer with Uploader & Download Action */}
-      <div
-        style={{
-          borderTop: '1px solid var(--border-subtle)',
-          paddingTop: '1rem',
-          marginTop: 'auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <img
-            src={
-              resource.uploader?.avatar ||
-              `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(resource.uploader?.name || 'Student')}`
-            }
-            alt={resource.uploader?.name}
-            style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--border-gold)' }}
-          />
-          <div>
-            <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{resource.uploader?.name}</div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-              {resource.uploader?.college}
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+              Course: <strong style={{ color: 'var(--text-primary)' }}>{resource.subject}</strong> • {resource.semester}
+            </div>
+
+            {/* Document Highlights Box */}
+            <div
+              style={{
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: '1.25rem',
+                marginBottom: '1.5rem'
+              }}
+            >
+              <h4 style={{ fontSize: '0.82rem', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.45rem', fontWeight: 700 }}>
+                DOCUMENT OVERVIEW & HIGHLIGHTS
+              </h4>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '0.85rem' }}>
+                {resource.description}
+              </p>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                {resource.tags?.map((tag, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      fontSize: '0.74rem',
+                      background: 'var(--bg-surface)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-secondary)',
+                      padding: '0.2rem 0.5rem',
+                      borderRadius: 'var(--radius-xs)',
+                      fontFamily: 'var(--font-mono)'
+                    }}
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Document Uploader Card */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '1rem',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border-medium)',
+                borderRadius: 'var(--radius-md)',
+                marginBottom: '1.75rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <img
+                  src={
+                    resource.uploader?.avatar ||
+                    `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(resource.uploader?.name || 'Student')}`
+                  }
+                  alt={resource.uploader?.name}
+                  style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover' }}
+                />
+                <div>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    Shared by {resource.uploader?.name}
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    {resource.uploader?.college} • Verified Student Scholar
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ textAlign: 'right' }}>
+                <div className="font-mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--savings-green)' }}>
+                  {downloadCount}
+                </div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  Downloads
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: '0.65rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+              <a
+                href={getResourcePdfUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+                style={{ textDecoration: 'none' }}
+              >
+                <Eye size={15} /> Read Full PDF
+              </a>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  showToast('Link copied to clipboard!', 'success');
+                }}
+              >
+                <Share2 size={15} /> Share
+              </button>
+              <button
+                type="button"
+                className="btn btn-accent"
+                onClick={handleDownload}
+                disabled={downloading}
+                style={{ padding: '0.65rem 1.35rem' }}
+              >
+                <Download size={16} /> Download PDF
+              </button>
             </div>
           </div>
         </div>
-
-        <button
-          className="btn btn-primary btn-sm"
-          onClick={handleDownload}
-          disabled={downloading}
-          style={{ fontSize: '0.82rem', padding: '0.45rem 0.95rem', borderRadius: '8px' }}
-        >
-          {downloading ? (
-            <>
-              <Check size={14} /> Preserved
-            </>
-          ) : (
-            <>
-              <Download size={14} /> <span className="font-mono">{downloadCount}</span>
-            </>
-          )}
-        </button>
-      </div>
-    </div>
+      )}
+    </>
   );
 };

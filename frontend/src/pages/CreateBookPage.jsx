@@ -2,20 +2,15 @@ import React, { useState } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { formatINR, calculateDiscount, calculateSavings } from '../utils/formatters';
 import {
   BookPlus,
-  Sparkles,
   Upload,
   Image as ImageIcon,
-  DollarSign,
   MapPin,
   CheckCircle,
   Eye,
-  ArrowRight,
-  Shield,
-  Award,
-  Layers,
-  BookMarked
+  ArrowRight
 } from 'lucide-react';
 
 export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
@@ -23,14 +18,19 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
   const { showToast } = useToast();
 
   const presets = [
-    { name: 'Quantum Dynamics', url: '/covers/cover_quantum.jpg' },
-    { name: 'Neural Architectures', url: '/covers/cover_neural.jpg' },
-    { name: 'Genomic Medicine', url: '/covers/cover_genomic.jpg' },
-    { name: 'Deep Astrophysics', url: '/covers/cover_astrophysics.jpg' },
-    { name: 'Quantitative Capital', url: '/covers/cover_finance.jpg' },
-    { name: 'Cybernetic Systems', url: '/covers/cover_cybernetics.jpg' },
-    { name: 'Ethical Jurisprudence', url: '/covers/cover_jurisprudence.jpg' },
-    { name: 'Algebraic Topology', url: '/covers/cover_topology.jpg' }
+    { name: 'Quantitative Capital / Innovation (Studio Yellow Edition)', url: '/covers/cover_quantitative_capital.jpg' },
+    { name: 'Algorithms & Data Structures (Studio Cobalt Blue)', url: '/covers/cover_algorithms.jpg' },
+    { name: 'Machine Learning & Neural Models (Studio Emerald Green)', url: '/covers/cover_machine_learning.jpg' },
+    { name: 'System Design & Distributed Systems (Studio Slate Teal)', url: '/covers/cover_system_design.jpg' },
+    { name: 'Cracking the Coding Interview (Studio Royal Violet)', url: '/covers/cover_interview_prep.jpg' },
+    { name: 'GATE Computer Science & IT (Studio Crimson Red)', url: '/covers/cover_competitive_exams.jpg' },
+    { name: 'Operating System Concepts (Studio Terracotta Orange)', url: '/covers/cover_operating_systems.jpg' },
+    { name: 'Clean Code (Studio Forest Green)', url: '/covers/cover_clean_code.jpg' },
+    { name: 'Cybernetic Systems & Robotics (Studio Deep Slate)', url: '/covers/cover_cybernetics.jpg' },
+    { name: 'Neural Architectures & AI (Studio Royal Indigo)', url: '/covers/cover_neural.jpg' },
+    { name: 'Quantum Dynamics (Studio Cyan Sapphire)', url: '/covers/cover_quantum.jpg' },
+    { name: 'Deep Astrophysics (Studio Midnight Navy)', url: '/covers/cover_astrophysics.jpg' },
+    { name: 'Algebraic Topology (Studio Ultramarine Blue)', url: '/covers/cover_topology.jpg' }
   ];
 
   const [formData, setFormData] = useState({
@@ -44,10 +44,10 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
     edition: 'Latest Edition',
     subject: '',
     semester: 'Semester 3 & 4',
-    campusLocation: user?.college ? `${user.college} Central Library Quad` : 'Campus Central Library Quad',
-    conditionNotes: 'Pristine pages, zero highlighting, firm spine binding.',
+    campusLocation: user?.college ? `${user.college} Central Library` : 'Campus Central Library',
+    conditionNotes: 'Clean pages, no markings, firm binding.',
     description: '',
-    coverImageUrl: '/covers/cover_quantum.jpg'
+    coverImageUrl: '/covers/cover_algorithms.jpg'
   });
 
   const [coverFile, setCoverFile] = useState(null);
@@ -55,11 +55,14 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
 
   const categories = [
     'Computer Science & AI',
-    'Medical & Healthcare',
+    'Machine Learning & AI',
+    'Software Development & Web',
+    'Interview Preparation & Coding',
+    'Competitive Exams',
     'Engineering & Technology',
+    'Medical & Healthcare',
     'Commerce, Finance & MBA',
     'Natural Sciences & Math',
-    'Competitive Exams',
     'Law & Legal Studies',
     'Humanities & Social Sciences',
     'Literature & Fiction'
@@ -88,7 +91,7 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
     }
 
     if (!formData.title || !formData.author || !formData.price) {
-      showToast('Please specify title, author, and price', 'error');
+      showToast('Please specify title, author, and price in ₹', 'error');
       return;
     }
 
@@ -110,7 +113,7 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
       data.append(
         'description',
         formData.description ||
-          `${formData.title} in ${formData.condition} condition. Available for direct campus peer handover.`
+        `${formData.title} in ${formData.condition} condition. Available for pickup on campus.`
       );
 
       if (coverFile) {
@@ -121,147 +124,151 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
 
       const res = await api.books.create(data);
       if (res.success) {
-        showToast('Monograph inscribed and listed in The Codex Exchange!', 'success');
+        showToast('Textbook listed on marketplace successfully!', 'success');
+        if (onSelectBook && res.book) {
+          onSelectBook(res.book);
+        }
         setCurrentView('marketplace');
       }
     } catch (err) {
-      showToast(err.message || 'Failed to list monograph', 'error');
+      showToast(err.message || 'Failed to list textbook', 'error');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const previewDiscount =
-    formData.originalPrice && formData.price && Number(formData.originalPrice) > Number(formData.price)
-      ? Math.round(
-          ((Number(formData.originalPrice) - Number(formData.price)) / Number(formData.originalPrice)) * 100
-        )
-      : null;
-
-  const previewSavings =
-    formData.originalPrice && formData.price && Number(formData.originalPrice) > Number(formData.price)
-      ? Math.round(Number(formData.originalPrice) - Number(formData.price))
-      : null;
+  const previewDiscount = calculateDiscount(formData.originalPrice, formData.price);
+  const previewSavings = calculateSavings(formData.originalPrice, formData.price);
 
   return (
-    <div style={{ padding: '2.5rem 0 4rem' }}>
+    <div style={{ padding: '2rem 0 4rem' }}>
       <div className="content-wrapper">
-        {/* Header Atelier Banner */}
-        <div style={{ marginBottom: '2.2rem' }}>
-          <div className="hero-badge-tag" style={{ marginBottom: '0.6rem' }}>
-            <Sparkles size={14} color="var(--accent-gold)" /> THE SCRIBE STUDIO • LIST MONOGRAPH
-          </div>
-          <h1 className="font-display" style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>
-            Inscribe a Monograph for Exchange
+        <div style={{ marginBottom: '2rem' }}>
+          <span className="eyebrow-tag" style={{ marginBottom: '0.4rem' }}>
+            CAMPUS DISPATCH // LISTING STUDIO
+          </span>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.2rem', fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>
+            Sell a Book
           </h1>
-          <p className="font-serif-literary" style={{ fontSize: '1.25rem', maxWidth: '720px' }}>
-            Pass your authoritative textbooks forward to incoming university scholars. Set fair student
-            pricing and designate a safe campus handover quad.
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+            List your course volumes for direct campus handover with zero platform fees
           </p>
         </div>
 
-        {/* Split Studio: Left Form & Right Realtime 3D Card Preview */}
-        <div className="scribe-studio-grid">
-          {/* Left: Progressive Form Sections */}
-          <form onSubmit={handleSubmit} className="glass-panel" style={{ padding: '2.4rem', borderRadius: 'var(--radius-xl)' }}>
-            {/* Section 1: Monograph Identity */}
-            <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.8rem', marginBottom: '1.8rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.2rem' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1.35fr) minmax(300px, 360px)',
+            gap: '2.5rem',
+            alignItems: 'start'
+          }}
+          className="create-book-layout"
+        >
+          {/* Form */}
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-md)',
+              padding: '2rem'
+            }}
+          >
+            {/* Section 1: Basic Details */}
+            <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--text-primary)', color: 'var(--bg-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.78rem' }}>
                   1
                 </div>
-                <h3 className="font-display" style={{ fontSize: '1.25rem' }}>Monograph Identity</h3>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>Basic Details</h3>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Full Title of Work *</label>
+                <label className="form-label">Book Title *</label>
                 <input
                   type="text"
                   required
+                  placeholder="e.g. Introduction to Algorithms"
                   className="form-input"
-                  placeholder="e.g. Introduction to Algorithms (CLRS Fourth Edition)"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className="form-group">
-                  <label className="form-label">Authors / Editors *</label>
+                  <label className="form-label">Author(s) *</label>
                   <input
                     type="text"
                     required
+                    placeholder="e.g. Cormen, Leiserson, Rivest"
                     className="form-input"
-                    placeholder="e.g. Cormen, Leiserson, Rivest, Stein"
                     value={formData.author}
                     onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Course Code (Optional)</label>
-                  <input
-                    type="text"
-                    className="form-input font-mono"
-                    placeholder="e.g. CS 204 or PHYS 301"
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem' }}>
-                <div className="form-group">
-                  <label className="form-label">Academic Faculty / Discipline</label>
+                  <label className="form-label">Category / Subject *</label>
                   <select
-                    className="form-input"
+                    className="form-select"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   >
-                    {categories.map((c, i) => (
-                      <option key={i} value={c}>{c}</option>
+                    {categories.map((c) => (
+                      <option key={c} value={c}>{c}</option>
                     ))}
                   </select>
                 </div>
+              </div>
 
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className="form-group">
-                  <label className="form-label">Edition & Year</label>
+                  <label className="form-label">Course Code (Optional)</label>
                   <input
                     type="text"
+                    placeholder="e.g. CS 201"
                     className="form-input"
-                    placeholder="e.g. 4th Global Edition (2022)"
-                    value={formData.edition}
-                    onChange={(e) => setFormData({ ...formData, edition: e.target.value })}
+                    value={formData.isbn}
+                    onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Semester</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Semester 3 & 4"
+                    className="form-input"
+                    value={formData.semester}
+                    onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
                   />
                 </div>
               </div>
             </div>
 
-            {/* Section 2: Condition & Provenance */}
-            <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.8rem', marginBottom: '1.8rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.2rem' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem' }}>
+            {/* Section 2: Book Condition & Photo */}
+            <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--text-primary)', color: 'var(--bg-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.78rem' }}>
                   2
                 </div>
-                <h3 className="font-display" style={{ fontSize: '1.25rem' }}>Condition Appraisal</h3>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>Book Condition & Photo</h3>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Preservation Grade</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  {conditions.map((cond, i) => (
+                <label className="form-label">Condition</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                  {conditions.map((cond) => (
                     <button
-                      key={i}
+                      key={cond}
                       type="button"
+                      className="quick-chip"
                       style={{
-                        background: formData.condition === cond ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
-                        color: formData.condition === cond ? '#ffffff' : 'var(--text-secondary)',
-                        border: `1px solid ${formData.condition === cond ? 'var(--primary-light)' : 'var(--border-subtle)'}`,
-                        padding: '0.45rem 1rem',
-                        borderRadius: '999px',
-                        fontSize: '0.85rem',
-                        fontWeight: 600,
-                        cursor: 'pointer'
+                        background: formData.condition === cond ? 'var(--text-primary)' : 'var(--bg-secondary)',
+                        color: formData.condition === cond ? 'var(--bg-surface)' : 'var(--text-secondary)',
+                        borderColor: formData.condition === cond ? 'var(--text-primary)' : 'var(--border-subtle)',
+                        fontWeight: formData.condition === cond ? 600 : 400
                       }}
                       onClick={() => setFormData({ ...formData, condition: cond })}
                     >
@@ -272,233 +279,212 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Provenance & Notation Checklist</label>
+                <label className="form-label">Notes on Condition (optional)</label>
                 <input
                   type="text"
+                  placeholder="e.g. Clean pages, no highlighting, tight binding"
                   className="form-input"
-                  placeholder="e.g. Crisp pages, minimal pencil underlines in Ch. 3, firm spine."
                   value={formData.conditionNotes}
                   onChange={(e) => setFormData({ ...formData, conditionNotes: e.target.value })}
                 />
               </div>
+
+              {/* Cover Photo */}
+              <div className="form-group">
+                <label className="form-label">
+                  Book Cover Photo <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(Optional)</span>
+                </label>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.65rem' }}>
+                  Upload a photo of your actual physical textbook, or choose from our real edition study desk photographs below:
+                </p>
+
+                {/* File Upload (Optional) */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="form-input"
+                    onChange={handleFileChange}
+                    style={{ padding: '0.45rem' }}
+                  />
+                  {coverFile && (
+                    <div style={{ fontSize: '0.78rem', color: 'var(--savings-green)', marginTop: '0.35rem', fontWeight: 600 }}>
+                      ✓ Custom photo selected: {coverFile.name}
+                    </div>
+                  )}
+                </div>
+
+                <label className="form-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                  Or select an authentic edition photo:
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                  {presets.map((preset, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => handlePresetSelect(preset.url)}
+                      style={{
+                        cursor: 'pointer',
+                        borderRadius: 'var(--radius-sm)',
+                        overflow: 'hidden',
+                        border: formData.coverImageUrl === preset.url && !coverFile ? '2px solid var(--accent-terracotta)' : '1px solid var(--border-subtle)',
+                        aspectRatio: '3 / 4',
+                        background: 'var(--bg-secondary)',
+                        position: 'relative'
+                      }}
+                      title={preset.name}
+                    >
+                      <img
+                        src={preset.url}
+                        alt={preset.name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {/* Section 3: Pricing & Value */}
-            <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.8rem', marginBottom: '1.8rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.2rem' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem' }}>
+            {/* Section 3: Price (₹) */}
+            <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--text-primary)', color: 'var(--bg-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.78rem' }}>
                   3
                 </div>
-                <h3 className="font-display" style={{ fontSize: '1.25rem' }}>Student Exchange Value</h3>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>Price (₹)</h3>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className="form-group">
-                  <label className="form-label">Your Offering Price ($) *</label>
+                  <label className="form-label">Selling Price (₹) *</label>
                   <input
                     type="number"
                     required
                     min="1"
                     className="form-input font-mono"
-                    placeholder="e.g. 38"
+                    placeholder="e.g. 450"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Original Retail MRP ($)</label>
+                  <label className="form-label">Original Price (₹)</label>
                   <input
                     type="number"
                     min="1"
                     className="form-input font-mono"
-                    placeholder="e.g. 110"
+                    placeholder="e.g. 1200"
                     value={formData.originalPrice}
                     onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
                   />
                 </div>
               </div>
 
-              {previewSavings && (
+              {previewSavings > 0 && (
                 <div
                   style={{
-                    background: 'rgba(16, 185, 129, 0.1)',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
-                    padding: '0.8rem 1rem',
-                    borderRadius: '8px',
-                    fontSize: '0.86rem',
-                    color: 'var(--accent-emerald)',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
+                    background: 'var(--savings-bg)',
+                    border: '1px solid var(--badge-new-border)',
+                    padding: '0.65rem 0.85rem',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.84rem',
+                    color: 'var(--savings-green)',
+                    fontWeight: 600
                   }}
                 >
-                  <Sparkles size={16} /> Fellow scholars save ${previewSavings} ({previewDiscount}% off retail) on this listing!
+                  Buyers save {formatINR(previewSavings)} ({previewDiscount}% off) on this book!
                 </div>
               )}
             </div>
 
-            {/* Section 4: Handover Quad */}
-            <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.8rem', marginBottom: '1.8rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.2rem' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem' }}>
+            {/* Section 4: Meeting Spot */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--text-primary)', color: 'var(--bg-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.78rem' }}>
                   4
                 </div>
-                <h3 className="font-display" style={{ fontSize: '1.25rem' }}>Campus Handover Quad</h3>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>Meeting Spot</h3>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Designated Meetup Landmark</label>
+                <label className="form-label">Where to Meet on Campus</label>
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="e.g. Central Library Atrium, Science Quad Canteen, or Engineering Hall"
+                  placeholder="e.g. Central Library Steps, Canteen, Main Gate"
                   value={formData.campusLocation}
                   onChange={(e) => setFormData({ ...formData, campusLocation: e.target.value })}
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">Curator's Notes & Advice</label>
+                <label className="form-label">Description (optional)</label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   className="form-input"
-                  placeholder="Why this volume was invaluable for coursework, exams, or research..."
+                  placeholder="Mention edition year, key course topics covered, or notes on interior condition..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
               </div>
             </div>
 
-            {/* Section 5: Cover Artwork Selection */}
-            <div style={{ marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.2rem' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem' }}>
-                  5
-                </div>
-                <h3 className="font-display" style={{ fontSize: '1.25rem' }}>Monograph Bindings & Artwork</h3>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Curated Hardcover Artwork Presets</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '0.6rem' }}>
-                  {presets.map((preset, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => handlePresetSelect(preset.url)}
-                      style={{
-                        border: formData.coverImageUrl === preset.url ? '2px solid var(--accent-gold)' : '1px solid var(--border-subtle)',
-                        borderRadius: '8px',
-                        overflow: 'hidden',
-                        cursor: 'pointer',
-                        padding: '4px',
-                        background: 'rgba(255,255,255,0.03)',
-                        transition: 'all 0.15s ease'
-                      }}
-                    >
-                      <img
-                        src={preset.url}
-                        alt={preset.name}
-                        style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '4px' }}
-                      />
-                      <div style={{ fontSize: '0.7rem', textAlign: 'center', marginTop: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {preset.name}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="form-group" style={{ marginTop: '1.2rem' }}>
-                <label className="form-label">Or Upload Custom Cover Photo</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  style={{ fontSize: '0.85rem' }}
-                />
-              </div>
-            </div>
-
             <button
               type="submit"
-              className="btn btn-primary btn-lg"
+              className="btn btn-accent btn-lg"
               disabled={submitting}
-              style={{ width: '100%', padding: '0.9rem 1.8rem', fontSize: '1rem', borderRadius: 'var(--radius-full)' }}
+              style={{ width: '100%' }}
             >
-              {submitting ? 'Inscribing Monograph...' : <><BookPlus size={18} /> Inscribe Monograph to Exchange</>}
+              {submitting ? 'Posting Book...' : 'Post Book for Sale'}
             </button>
           </form>
 
-          {/* Right: Sticky Live 3D Card Preview */}
-          <div className="sticky-preview-card">
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                fontSize: '0.82rem',
-                fontWeight: 700,
-                color: 'var(--accent-gold)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                marginBottom: '1rem'
-              }}
-            >
-              <Eye size={16} /> Live Codex Card Preview
+          {/* Right Column: Live Card Preview */}
+          <div style={{ position: 'sticky', top: 'calc(var(--nav-height) + 1.5rem)' }}>
+            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.5rem' }}>
+              Preview
             </div>
 
-            <div className="book-card" style={{ maxWidth: '340px', margin: '0 auto', boxShadow: 'var(--shadow-book)' }}>
-              {/* Cover Image Wrapper with Spine */}
+            <div
+              className="book-card"
+              style={{ pointerEvents: 'none' }}
+            >
               <div className="book-card-image-wrap">
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    width: '18px',
-                    background: 'linear-gradient(90deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 30%, transparent 100%)',
-                    zIndex: 3,
-                    pointerEvents: 'none'
-                  }}
-                />
                 <img
                   src={formData.coverImageUrl || '/covers/cover_placeholder.jpg'}
-                  alt="Preview Cover"
+                  alt="Preview"
                   className="book-card-image"
                 />
-                <div style={{ position: 'absolute', top: '12px', left: '16px', zIndex: 4 }}>
-                  <span className="badge badge-like-new">{formData.condition}</span>
+                <div style={{ position: 'absolute', top: '10px', left: '10px' }}>
+                  <span className="badge badge-like-new">
+                    {formData.condition}
+                  </span>
                 </div>
-                {previewDiscount && previewDiscount > 0 && (
+                {previewDiscount > 0 && (
                   <div
                     style={{
                       position: 'absolute',
-                      bottom: '12px',
-                      left: '16px',
-                      zIndex: 4,
-                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                      color: '#ffffff',
+                      bottom: '10px',
+                      left: '10px',
+                      background: 'var(--savings-bg)',
+                      color: 'var(--savings-green)',
+                      border: '1px solid var(--badge-new-border)',
                       fontSize: '0.72rem',
-                      fontWeight: 800,
-                      padding: '0.22rem 0.6rem',
-                      borderRadius: '999px',
+                      fontWeight: 700,
+                      padding: '0.18rem 0.55rem',
+                      borderRadius: 'var(--radius-sm)',
                       fontFamily: 'var(--font-mono)'
                     }}
                   >
-                    SAVE {previewDiscount}%
+                    {previewDiscount}% OFF
                   </div>
                 )}
               </div>
 
               <div className="book-card-body">
-                <div className="book-card-category" style={{ letterSpacing: '0.08em' }}>
-                  {formData.category}
-                </div>
-                <h3 className="book-card-title font-serif-literary" style={{ fontSize: '1.18rem', lineHeight: '1.35' }}>
-                  {formData.title || 'Introduction to Algorithms (CLRS)'}
+                <div className="book-card-category">{formData.category}</div>
+                <h3 className="book-card-title">
+                  {formData.title || 'Book Title'}
                 </h3>
                 <p className="book-card-author">
                   by {formData.author || 'Author Name'}
@@ -508,47 +494,32 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.4rem',
+                    gap: '0.35rem',
                     fontSize: '0.78rem',
-                    color: 'var(--text-secondary)',
-                    marginBottom: '0.8rem'
+                    color: 'var(--text-muted)',
+                    marginBottom: '0.75rem'
                   }}
                 >
-                  <MapPin size={13} color="var(--accent-gold)" />
+                  <MapPin size={13} style={{ flexShrink: 0 }} />
                   <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {formData.campusLocation || 'Campus Central Library Quad'}
+                    {formData.campusLocation || 'Central Library'}
                   </span>
                 </div>
 
                 <div className="book-card-footer">
                   <div className="book-price-box">
-                    <span className="book-price-current font-mono">${formData.price || '0'}</span>
+                    <span className="book-price-current font-mono">
+                      {formData.price ? formatINR(formData.price) : '₹0'}
+                    </span>
                     {formData.originalPrice > formData.price && (
-                      <span className="book-price-original font-mono">${formData.originalPrice}</span>
+                      <span className="book-price-original font-mono">
+                        {formatINR(formData.originalPrice)}
+                      </span>
                     )}
                   </div>
-                  <span className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.8rem', borderRadius: '8px' }}>
-                    Inspect
-                  </span>
+                  <span className="btn btn-secondary btn-sm">Inspect</span>
                 </div>
               </div>
-            </div>
-
-            <div
-              className="glass-panel"
-              style={{
-                marginTop: '1.6rem',
-                padding: '1.2rem',
-                fontSize: '0.85rem',
-                lineHeight: 1.6,
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border-gold)'
-              }}
-            >
-              🏛️ <strong>Collegiate Handover Advice:</strong> Monograms designated with specific campus
-              meeting spots near central library atriums receive 3x more buyer inquiries and finalize
-              within 48 hours.
             </div>
           </div>
         </div>

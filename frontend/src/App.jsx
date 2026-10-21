@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
 import { ToastContainer } from './components/ToastContainer';
@@ -16,10 +16,44 @@ import { InquiriesPage } from './pages/InquiriesPage';
 import { DashboardPage } from './pages/DashboardPage';
 
 function AppContent() {
-  const [currentView, setCurrentView] = useState('home');
+  const [currentView, setCurrentView] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace('#', '');
+      if (['home', 'marketplace', 'vault', 'sell', 'inquiries', 'dashboard'].includes(hash)) {
+        return hash;
+      }
+    }
+    return 'home';
+  });
   const [selectedBook, setSelectedBook] = useState(null);
   const [inquireBook, setInquireBook] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+
+  // Sync hash changes with currentView
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (['home', 'marketplace', 'vault', 'sell', 'inquiries', 'dashboard'].includes(hash)) {
+        setCurrentView(hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Global Keyboard Shortcut (⌘K or Ctrl+K) to focus search/marketplace
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCurrentView('marketplace');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleOpenBookDetail = (book) => {
     setSelectedBook(book);
@@ -46,6 +80,8 @@ function AppContent() {
             onSelectBook={handleOpenBookDetail}
             onInquireBook={handleStartInquiry}
             setSearchQuery={setSearchQuery}
+            categoryFilter={categoryFilter}
+            setCategoryFilter={setCategoryFilter}
           />
         )}
 
@@ -55,6 +91,8 @@ function AppContent() {
             onInquireBook={handleStartInquiry}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
+            categoryFilter={categoryFilter}
+            setCategoryFilter={setCategoryFilter}
           />
         )}
 
@@ -102,7 +140,10 @@ function AppContent() {
       <ToastContainer />
 
       {/* Global Footer */}
-      <Footer setCurrentView={setCurrentView} />
+      <Footer
+        setCurrentView={setCurrentView}
+        setCategoryFilter={setCategoryFilter}
+      />
     </div>
   );
 }

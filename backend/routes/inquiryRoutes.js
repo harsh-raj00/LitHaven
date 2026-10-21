@@ -38,7 +38,7 @@ router.post('/', protect, async (req, res, next) => {
       // Append message to existing thread
       inquiry.messages.push({
         sender: req.user._id,
-        text: message || `Updated offer: $${offeredPrice || book.price}`
+        text: message || `Updated offer: ₹${offeredPrice || book.price}`
       });
       if (offeredPrice) inquiry.offeredPrice = Number(offeredPrice);
       if (proposedLocation) inquiry.proposedLocation = proposedLocation;
@@ -83,7 +83,7 @@ router.get('/my-inquiries', protect, async (req, res, next) => {
     const inquiries = await Inquiry.find({
       $or: [{ buyer: req.user._id }, { seller: req.user._id }]
     })
-      .sort({ lastMessageAt: -1 })
+      .sort({ lastMessageAt: -1, createdAt: -1, _id: -1 })
       .populate('book', 'title author coverImage price status')
       .populate('buyer', 'name college department avatar')
       .populate('seller', 'name college department avatar');

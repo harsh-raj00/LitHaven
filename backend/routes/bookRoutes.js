@@ -59,13 +59,29 @@ router.get('/', async (req, res, next) => {
       query.status = status;
     }
 
-    // Category filter
-    if (category && category !== 'All') {
-      query.category = category;
+    // Category filter with alias and fuzzy matching
+    if (category && category !== 'All' && category !== '') {
+      if (/^engineering/i.test(category)) {
+        query.category = { $regex: /Engineering/i };
+      } else if (/^quantitative\s*finance/i.test(category) || /^commerce/i.test(category)) {
+        query.$or = [
+          { category: { $regex: /Commerce/i } },
+          { subject: { $regex: /Quantitative Finance/i } },
+          { title: { $regex: /Quantitative/i } }
+        ];
+      } else if (/^computer\s*science/i.test(category)) {
+        query.category = { $regex: /Computer Science/i };
+      } else if (/^machine\s*learning/i.test(category)) {
+        query.category = { $regex: /Machine Learning/i };
+      } else if (/^competitive/i.test(category)) {
+        query.category = { $regex: /Competitive Exams/i };
+      } else {
+        query.category = category;
+      }
     }
 
     // Condition filter
-    if (condition && condition !== 'All') {
+    if (condition && condition !== 'All' && condition !== '') {
       query.condition = condition;
     }
 
@@ -75,30 +91,66 @@ router.get('/', async (req, res, next) => {
     }
 
     // Semester filter
-    if (semester && semester !== 'All') {
+    if (semester && semester !== 'All' && semester !== '') {
       query.semester = { $regex: semester, $options: 'i' };
     }
 
     // Price range filter
     if (minPrice !== undefined || maxPrice !== undefined) {
-      query.price = {};
+      const priceFilter = {};
       if (minPrice !== undefined && minPrice !== '') {
-        query.price.$gte = Number(minPrice);
+        priceFilter.$gte = Number(minPrice);
       }
       if (maxPrice !== undefined && maxPrice !== '') {
-        query.price.$lte = Number(maxPrice);
+        priceFilter.$lte = Number(maxPrice);
+      }
+      if (Object.keys(priceFilter).length > 0) {
+        query.price = priceFilter;
       }
     }
 
-    // Search query (title, author, subject, description)
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { author: { $regex: search, $options: 'i' } },
-        { subject: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { isbn: { $regex: search, $options: 'i' } }
+    // Search query (title, author, subject, description, isbn, category)
+    if (search && search.trim() !== '') {
+      const rawSearch = search.trim();
+      const escaped = rawSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      const searchConditions = [
+        { title: { $regex: escaped, $options: 'i' } },
+        { author: { $regex: escaped, $options: 'i' } },
+        { subject: { $regex: escaped, $options: 'i' } },
+        { description: { $regex: escaped, $options: 'i' } },
+        { isbn: { $regex: escaped, $options: 'i' } },
+        { category: { $regex: escaped, $options: 'i' } }
       ];
+
+      // Handle common aliases for popular subject searches
+      if (/engineering\s*(&\s*tech|\s*tech)/i.test(rawSearch)) {
+        searchConditions.push({ category: { $regex: /Engineering/i } });
+        searchConditions.push({ subject: { $regex: /Engineering/i } });
+      }
+      if (/quantitative\s*finance/i.test(rawSearch)) {
+        searchConditions.push({ subject: { $regex: /Quantitative Finance/i } });
+        searchConditions.push({ title: { $regex: /Quantitative/i } });
+        searchConditions.push({ category: { $regex: /Commerce, Finance/i } });
+      }
+      if (/computer\s*science/i.test(rawSearch)) {
+        searchConditions.push({ category: { $regex: /Computer Science/i } });
+      }
+      if (/machine\s*learning/i.test(rawSearch)) {
+        searchConditions.push({ category: { $regex: /Machine Learning/i } });
+        searchConditions.push({ subject: { $regex: /Machine Learning/i } });
+      }
+      if (/competitive\s*exams?/i.test(rawSearch)) {
+        searchConditions.push({ category: { $regex: /Competitive Exams/i } });
+        searchConditions.push({ subject: { $regex: /GATE|CAT|Aptitude/i } });
+      }
+
+      if (query.$or) {
+        query.$and = [{ $or: query.$or }, { $or: searchConditions }];
+        delete query.$or;
+      } else {
+        query.$or = searchConditions;
+      }
     }
 
     // Sort order
@@ -170,14 +222,17 @@ router.get('/categories', async (req, res, next) => {
     ]);
 
     const categories = [
+      'Computer Science & AI',
+      'Machine Learning & AI',
+      'Software Development & Web',
+      'Interview Preparation & Coding',
+      'Competitive Exams',
       'Engineering & Technology',
       'Medical & Healthcare',
-      'Computer Science & AI',
-      'Natural Sciences & Math',
       'Commerce, Finance & MBA',
+      'Natural Sciences & Math',
       'Law & Legal Studies',
       'Humanities & Social Sciences',
-      'Competitive Exams',
       'Literature & Fiction'
     ].map((cat) => {
       const match = counts.find((c) => c._id === cat);

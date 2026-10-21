@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
   BookOpen,
-  Sparkles,
   Search,
   PlusCircle,
   MessageSquare,
@@ -18,7 +17,7 @@ import {
 
 export const Navbar = ({ currentView, setCurrentView }) => {
   const { user, isAuthenticated, logout, openAuthModal } = useAuth();
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('light');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -26,316 +25,497 @@ export const Navbar = ({ currentView, setCurrentView }) => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  // Close mobile drawer on desktop resize & handle Escape
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 860) {
+        setMobileMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false);
+        setUserMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Lock background scroll when mobile drawer is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   const handleNav = (view) => {
     setCurrentView(view);
+    window.location.hash = view;
     setMobileMenuOpen(false);
     setUserMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        {/* Brand */}
-        <div
-          className="nav-brand"
-          style={{ cursor: 'pointer' }}
-          onClick={() => handleNav('home')}
-        >
-          <div className="nav-brand-logo">
-            <BookOpen size={22} />
+    <>
+      <nav className="navbar">
+        <div className="navbar-container">
+          {/* Brand */}
+          <div
+            className="nav-brand"
+            onClick={() => handleNav('home')}
+          >
+            <div className="nav-brand-logo">
+              <BookOpen size={18} />
+            </div>
+            <span className="nav-brand-title">LitHaven</span>
           </div>
-          <div>
-            LitHaven
-            <span
+
+          {/* Desktop Links (Pill Dock) */}
+          <ul className="nav-links">
+            <li>
+              <button
+                className={`nav-link ${currentView === 'home' ? 'active' : ''}`}
+                onClick={() => handleNav('home')}
+              >
+                Home
+              </button>
+            </li>
+            <li>
+              <button
+                className={`nav-link ${currentView === 'marketplace' ? 'active' : ''}`}
+                onClick={() => handleNav('marketplace')}
+              >
+                <Search size={14} /> Find Books
+              </button>
+            </li>
+            <li>
+              <button
+                className={`nav-link ${currentView === 'vault' ? 'active' : ''}`}
+                onClick={() => handleNav('vault')}
+              >
+                <FileText size={14} /> Study Vault
+              </button>
+            </li>
+            {isAuthenticated && (
+              <li>
+                <button
+                  className={`nav-link ${currentView === 'inquiries' ? 'active' : ''}`}
+                  onClick={() => handleNav('inquiries')}
+                >
+                  <MessageSquare size={14} /> Messages
+                </button>
+              </li>
+            )}
+          </ul>
+
+          {/* Right Actions */}
+          <div className="nav-actions">
+            {/* Quick Search Shortcut (Desktop) */}
+            <button
+              type="button"
+              onClick={() => handleNav('marketplace')}
+              className="navbar-search-pill"
               style={{
-                fontSize: '0.65rem',
-                display: 'block',
-                fontWeight: 600,
-                color: 'var(--accent-gold)',
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                marginTop: '-4px'
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-full)',
+                padding: '0.35rem 0.8rem',
+                fontSize: '0.8rem',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                transition: 'var(--transition)'
+              }}
+              title="Search Books (⌘K)"
+            >
+              <Search size={13} />
+              <span style={{ fontSize: '0.78rem' }}>Search</span>
+              <kbd
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.65rem',
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border-medium)',
+                  borderRadius: '3px',
+                  padding: '0.08rem 0.35rem',
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                ⌘K
+              </kbd>
+            </button>
+
+            {/* Theme switch button */}
+            <button
+              onClick={toggleTheme}
+              className="btn btn-ghost btn-sm"
+              style={{ width: '36px', height: '36px', padding: 0, borderRadius: 'var(--radius-sm)' }}
+              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
+
+            {/* Desktop "Sell a Book" CTA (hidden on mobile, provided by mobile dock & drawer) */}
+            <button
+              className="btn btn-accent btn-sm nav-cta-btn"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  openAuthModal('login');
+                } else {
+                  handleNav('sell');
+                }
               }}
             >
-              Academic Sanctuary
-            </span>
+              <PlusCircle size={15} /> Sell a Book
+            </button>
+
+            {/* User state */}
+            {isAuthenticated ? (
+              <div style={{ position: 'relative' }}>
+                <div
+                  className="user-nav-pill"
+                  onClick={() => setUserMenuOpen((prev) => !prev)}
+                  title={user?.name}
+                >
+                  <img
+                    src={
+                      user?.avatar ||
+                      `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(user?.name || 'User')}`
+                    }
+                    alt={user?.name}
+                    className="user-avatar-small"
+                  />
+                  <span className="user-nav-name" style={{ fontSize: '0.86rem', fontWeight: 600 }}>
+                    {user?.name?.split(' ')[0]}
+                  </span>
+                </div>
+
+                {/* Desktop User Dropdown Menu */}
+                {userMenuOpen && (
+                  <div
+                    className="glass-panel"
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 8px)',
+                      right: 0,
+                      width: '220px',
+                      padding: '0.5rem',
+                      borderRadius: 'var(--radius-md)',
+                      zIndex: 200,
+                      boxShadow: 'var(--shadow-lg)'
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: '0.5rem 0.75rem',
+                        borderBottom: '1px solid var(--border-subtle)',
+                        marginBottom: '0.35rem'
+                      }}
+                    >
+                      <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{user?.name}</div>
+                      <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+                        {user?.college}
+                      </div>
+                    </div>
+
+                    <button
+                      className="btn btn-ghost"
+                      style={{
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: '0.45rem 0.75rem',
+                        fontSize: '0.85rem'
+                      }}
+                      onClick={() => handleNav('dashboard')}
+                    >
+                      <LayoutDashboard size={15} /> My Profile
+                    </button>
+
+                    <button
+                      className="btn btn-ghost"
+                      style={{
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: '0.45rem 0.75rem',
+                        fontSize: '0.85rem'
+                      }}
+                      onClick={() => handleNav('inquiries')}
+                    >
+                      <MessageSquare size={15} /> Messages
+                    </button>
+
+                    <div style={{ borderTop: '1px solid var(--border-subtle)', margin: '0.35rem 0' }} />
+
+                    <button
+                      className="btn btn-ghost"
+                      style={{
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: '0.45rem 0.75rem',
+                        fontSize: '0.85rem',
+                        color: 'var(--danger)'
+                      }}
+                      onClick={() => {
+                        logout();
+                        setUserMenuOpen(false);
+                        handleNav('home');
+                      }}
+                    >
+                      <LogOut size={15} /> Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                className="btn btn-secondary btn-sm nav-signin-btn"
+                onClick={() => openAuthModal('login')}
+              >
+                Sign In
+              </button>
+            )}
+
+            {/* Mobile Menu Toggle Button */}
+            <button
+              className="mobile-menu-btn"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
 
-        {/* Desktop Links */}
-        <ul className="nav-links">
-          <li>
-            <button
-              className={`nav-link ${currentView === 'home' ? 'active' : ''}`}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
-              onClick={() => handleNav('home')}
-            >
-              Discover
-            </button>
-          </li>
-          <li>
-            <button
-              className={`nav-link ${currentView === 'marketplace' ? 'active' : ''}`}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
-              onClick={() => handleNav('marketplace')}
-            >
-              <Search size={16} /> Codex Exchange
-            </button>
-          </li>
-          <li>
-            <button
-              className={`nav-link ${currentView === 'vault' ? 'active' : ''}`}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
-              onClick={() => handleNav('vault')}
-            >
-              <FileText size={16} /> The Scriptorium
-            </button>
-          </li>
-          {isAuthenticated && (
-            <li>
-              <button
-                className={`nav-link ${currentView === 'inquiries' ? 'active' : ''}`}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
-                onClick={() => handleNav('inquiries')}
-              >
-                <MessageSquare size={16} /> Offers & Chats
-              </button>
-            </li>
-          )}
-        </ul>
+        {/* Mobile Drawer Backdrop */}
+        {mobileMenuOpen && (
+          <div
+            className="mobile-drawer-backdrop"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
 
-        {/* Right Actions */}
-        <div className="nav-actions">
-          {/* Theme switch button */}
-          <button
-            onClick={toggleTheme}
-            className="btn btn-ghost btn-sm"
-            style={{ width: '38px', height: '38px', padding: 0, borderRadius: '50%' }}
-            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-          >
-            {theme === 'dark' ? <Sun size={18} color="#fbbf24" /> : <Moon size={18} color="#6366f1" />}
-          </button>
-
-          {/* List Book CTA */}
-          <button
-            className="btn btn-accent btn-sm"
-            onClick={() => {
-              if (!isAuthenticated) {
-                openAuthModal('login');
-              } else {
-                handleNav('sell');
-              }
-            }}
-          >
-            <PlusCircle size={16} /> List a Book
-          </button>
-
-          {/* User state */}
-          {isAuthenticated ? (
-            <div style={{ position: 'relative' }}>
-              <div
-                className="user-nav-pill"
-                onClick={() => setUserMenuOpen((prev) => !prev)}
-              >
+        {/* Mobile Drawer Panel */}
+        {mobileMenuOpen && (
+          <div className="mobile-drawer-panel">
+            {/* User Quick Info or Guest Banner */}
+            {isAuthenticated ? (
+              <div className="mobile-user-card" onClick={() => handleNav('dashboard')}>
                 <img
                   src={
                     user?.avatar ||
                     `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(user?.name || 'User')}`
                   }
                   alt={user?.name}
-                  className="user-avatar-small"
+                  className="mobile-user-avatar"
                 />
-                <span style={{ fontSize: '0.88rem', fontWeight: 600 }}>
-                  {user?.name?.split(' ')[0]}
-                </span>
+                <div className="mobile-user-meta">
+                  <div className="mobile-user-name">{user?.name}</div>
+                  <div className="mobile-user-college">{user?.college || 'Verified Campus Scholar'}</div>
+                </div>
               </div>
-
-              {/* Dropdown Menu */}
-              {userMenuOpen && (
-                <div
-                  className="glass-panel"
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 10px)',
-                    right: 0,
-                    width: '240px',
-                    padding: '0.8rem',
-                    borderRadius: '16px',
-                    zIndex: 200,
-                    boxShadow: 'var(--shadow-lg)'
+            ) : (
+              <div className="mobile-auth-banner">
+                <div style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.2rem' }}>
+                  Welcome to LitHaven
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+                  Peer-to-peer textbook marketplace with zero platform fees.
+                </div>
+                <button
+                  className="btn btn-primary btn-sm"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openAuthModal('login');
                   }}
                 >
-                  <div
-                    style={{
-                      padding: '0.6rem 0.8rem',
-                      borderBottom: '1px solid var(--border-subtle)',
-                      marginBottom: '0.5rem'
-                    }}
-                  >
-                    <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{user?.name}</div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                      {user?.college}
-                    </div>
-                  </div>
+                  Sign In or Register
+                </button>
+              </div>
+            )}
 
-                  <button
-                    className="btn btn-ghost"
-                    style={{
-                      width: '100%',
-                      justifyContent: 'flex-start',
-                      borderRadius: '8px',
-                      padding: '0.55rem 0.8rem',
-                      fontSize: '0.88rem'
-                    }}
-                    onClick={() => handleNav('dashboard')}
-                  >
-                    <LayoutDashboard size={16} /> My Dashboard
-                  </button>
+            {/* Mobile Search Quick Trigger */}
+            <div
+              className="mobile-search-trigger"
+              onClick={() => handleNav('marketplace')}
+            >
+              <Search size={16} />
+              <span>Search 1,200+ textbooks & notes...</span>
+            </div>
 
+            {/* Navigation Links */}
+            <div className="mobile-drawer-nav">
+              <button
+                className={`mobile-drawer-link ${currentView === 'home' ? 'active' : ''}`}
+                onClick={() => handleNav('home')}
+              >
+                <BookOpen size={18} />
+                <span>Home</span>
+              </button>
+
+              <button
+                className={`mobile-drawer-link ${currentView === 'marketplace' ? 'active' : ''}`}
+                onClick={() => handleNav('marketplace')}
+              >
+                <Search size={18} />
+                <span>Find Books & Textbooks</span>
+              </button>
+
+              <button
+                className={`mobile-drawer-link ${currentView === 'vault' ? 'active' : ''}`}
+                onClick={() => handleNav('vault')}
+              >
+                <FileText size={18} />
+                <span>Study Vault & PDFs</span>
+              </button>
+
+              <button
+                className={`mobile-drawer-link mobile-sell-link ${currentView === 'sell' ? 'active' : ''}`}
+                onClick={() => {
+                  if (!isAuthenticated) openAuthModal('login');
+                  else handleNav('sell');
+                }}
+              >
+                <PlusCircle size={18} />
+                <span>List a Book for Sale</span>
+                <span className="badge badge-accent" style={{ marginLeft: 'auto', fontSize: '0.68rem', padding: '0.1rem 0.4rem' }}>
+                  Zero Fee
+                </span>
+              </button>
+
+              {isAuthenticated && (
+                <>
                   <button
-                    className="btn btn-ghost"
-                    style={{
-                      width: '100%',
-                      justifyContent: 'flex-start',
-                      borderRadius: '8px',
-                      padding: '0.55rem 0.8rem',
-                      fontSize: '0.88rem'
-                    }}
+                    className={`mobile-drawer-link ${currentView === 'inquiries' ? 'active' : ''}`}
                     onClick={() => handleNav('inquiries')}
                   >
-                    <MessageSquare size={16} /> Inquiries & Offers
+                    <MessageSquare size={18} />
+                    <span>Messages & Chats</span>
                   </button>
-
-                  <div style={{ borderTop: '1px solid var(--border-subtle)', margin: '0.4rem 0' }} />
 
                   <button
-                    className="btn btn-ghost"
-                    style={{
-                      width: '100%',
-                      justifyContent: 'flex-start',
-                      borderRadius: '8px',
-                      padding: '0.55rem 0.8rem',
-                      fontSize: '0.88rem',
-                      color: 'var(--accent-rose)'
-                    }}
-                    onClick={() => {
-                      logout();
-                      setUserMenuOpen(false);
-                      handleNav('home');
-                    }}
+                    className={`mobile-drawer-link ${currentView === 'dashboard' ? 'active' : ''}`}
+                    onClick={() => handleNav('dashboard')}
                   >
-                    <LogOut size={16} /> Sign Out
+                    <LayoutDashboard size={18} />
+                    <span>My Profile & Wishlist</span>
                   </button>
-                </div>
+                </>
               )}
             </div>
-          ) : (
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => openAuthModal('login')}
-            >
-              Sign In
-            </button>
-          )}
 
-          {/* Mobile hamburger toggle */}
-          <button
-            className="btn btn-ghost btn-sm mobile-menu-btn"
-            style={{ padding: '0.4rem', border: '1px solid var(--border-subtle)', borderRadius: '10px' }}
-            onClick={() => setMobileMenuOpen((prev) => !prev)}
-            aria-label="Toggle Navigation"
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
-      </div>
+            {/* Theme Toggle & Status Footer in Drawer */}
+            <div className="mobile-drawer-footer">
+              <button
+                className="mobile-theme-row"
+                onClick={toggleTheme}
+                type="button"
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                  <span style={{ fontSize: '0.86rem', fontWeight: 500 }}>
+                    {theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                  </span>
+                </div>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                  {theme === 'dark' ? 'Dark' : 'Light'}
+                </span>
+              </button>
 
-      {/* Responsive Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div
-          className="glass-panel"
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
-            padding: '1.2rem 1.5rem',
-            borderTop: '1px solid var(--border-subtle)',
-            borderBottom: '1px solid var(--border-subtle)',
-            borderRadius: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.8rem',
-            background: 'var(--bg-glass-heavy)',
-            backdropFilter: 'blur(20px)',
-            animation: 'fadeIn 0.25s ease'
-          }}
+              {isAuthenticated && (
+                <button
+                  className="mobile-signout-btn"
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                    handleNav('home');
+                  }}
+                >
+                  <LogOut size={16} />
+                  <span>Sign Out</span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+      </nav>
+
+      {/* Mobile Floating Bottom Dock */}
+      <div className="mobile-bottom-dock">
+        <button
+          className={`mobile-dock-btn ${currentView === 'home' ? 'active' : ''}`}
+          onClick={() => handleNav('home')}
+          aria-label="Home"
         >
-          <button
-            className={`btn btn-ghost ${currentView === 'home' ? 'active' : ''}`}
-            style={{ justifyContent: 'flex-start', padding: '0.7rem 1rem' }}
-            onClick={() => handleNav('home')}
-          >
-            <Sparkles size={18} color="var(--accent-gold)" /> Discover Atelier
-          </button>
-          <button
-            className={`btn btn-ghost ${currentView === 'marketplace' ? 'active' : ''}`}
-            style={{ justifyContent: 'flex-start', padding: '0.7rem 1rem' }}
-            onClick={() => handleNav('marketplace')}
-          >
-            <Search size={18} /> The Codex Exchange
-          </button>
-          <button
-            className={`btn btn-ghost ${currentView === 'vault' ? 'active' : ''}`}
-            style={{ justifyContent: 'flex-start', padding: '0.7rem 1rem' }}
-            onClick={() => handleNav('vault')}
-          >
-            <FileText size={18} /> The Scriptorium
-          </button>
+          <BookOpen size={19} />
+          <span>Home</span>
+        </button>
 
-          {isAuthenticated ? (
-            <>
-              <button
-                className={`btn btn-ghost ${currentView === 'inquiries' ? 'active' : ''}`}
-                style={{ justifyContent: 'flex-start', padding: '0.7rem 1rem' }}
-                onClick={() => handleNav('inquiries')}
-              >
-                <MessageSquare size={18} /> Campus Offers & Chats
-              </button>
-              <button
-                className={`btn btn-ghost ${currentView === 'dashboard' ? 'active' : ''}`}
-                style={{ justifyContent: 'flex-start', padding: '0.7rem 1rem' }}
-                onClick={() => handleNav('dashboard')}
-              >
-                <LayoutDashboard size={18} /> Scholar's Dashboard
-              </button>
-              <button
-                className="btn btn-accent"
-                style={{ width: '100%', marginTop: '0.5rem' }}
-                onClick={() => handleNav('sell')}
-              >
-                <PlusCircle size={18} /> Scribe Studio (List Monograph)
-              </button>
-            </>
-          ) : (
-            <button
-              className="btn btn-primary"
-              style={{ width: '100%', marginTop: '0.5rem' }}
-              onClick={() => {
-                setMobileMenuOpen(false);
-                openAuthModal('login');
-              }}
-            >
-              Sign In to Sanctuary
-            </button>
-          )}
-        </div>
-      )}
-    </nav>
+        <button
+          className={`mobile-dock-btn ${currentView === 'marketplace' ? 'active' : ''}`}
+          onClick={() => handleNav('marketplace')}
+          aria-label="Books"
+        >
+          <Search size={19} />
+          <span>Books</span>
+        </button>
+
+        <button
+          className={`mobile-dock-btn mobile-dock-sell-btn ${currentView === 'sell' ? 'active' : ''}`}
+          onClick={() => {
+            if (!isAuthenticated) openAuthModal('login');
+            else handleNav('sell');
+          }}
+          title="Sell a Book"
+          aria-label="Sell a Book"
+        >
+          <PlusCircle size={22} />
+        </button>
+
+        <button
+          className={`mobile-dock-btn ${currentView === 'vault' ? 'active' : ''}`}
+          onClick={() => handleNav('vault')}
+          aria-label="Study Vault"
+        >
+          <FileText size={19} />
+          <span>Vault</span>
+        </button>
+
+        <button
+          className={`mobile-dock-btn ${currentView === 'dashboard' || currentView === 'inquiries' ? 'active' : ''}`}
+          onClick={() => {
+            if (!isAuthenticated) openAuthModal('login');
+            else handleNav('dashboard');
+          }}
+          aria-label={isAuthenticated ? 'Profile' : 'Sign In'}
+        >
+          <User size={19} />
+          <span>{isAuthenticated ? 'Profile' : 'Sign In'}</span>
+        </button>
+      </div>
+    </>
   );
 };

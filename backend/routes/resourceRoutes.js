@@ -148,6 +148,30 @@ router.post('/:id/download', async (req, res, next) => {
   }
 });
 
+// @route   POST /api/resources/:id/like
+// @desc    Toggle upvote / like on a study resource
+// @access  Public
+router.post('/:id/like', async (req, res, next) => {
+  try {
+    const { action } = req.body;
+    const delta = action === 'unlike' ? -1 : 1;
+    const resource = await Resource.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { upvotes: delta } },
+      { new: true }
+    );
+    if (!resource) {
+      return res.status(404).json({ success: false, message: 'Resource not found' });
+    }
+    res.json({
+      success: true,
+      upvotes: Math.max(0, resource.upvotes)
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // @route   POST /api/resources
 // @desc    Upload a new study resource (file upload or shared drive link)
 // @access  Private

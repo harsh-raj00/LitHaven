@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { formatINR } from '../utils/formatters';
 import {
   MessageSquare,
   Send,
@@ -9,12 +10,8 @@ import {
   XCircle,
   Clock,
   MapPin,
-  DollarSign,
-  User,
-  BookOpen,
-  Sparkles,
-  ShieldCheck,
-  CheckCheck
+  CheckCheck,
+  ArrowLeft
 } from 'lucide-react';
 
 export const InquiriesPage = () => {
@@ -26,18 +23,51 @@ export const InquiriesPage = () => {
   const [loading, setLoading] = useState(true);
   const [messageText, setMessageText] = useState('');
   const [sending, setSending] = useState(false);
+  const [showChatMobile, setShowChatMobile] = useState(false);
+
+  // Ref to track the user's active selected conversation across intervals and async fetches
+  const selectedInquiryIdRef = useRef(null);
+
+  // Keep selectedInquiryIdRef in sync with state
+  useEffect(() => {
+    if (selectedInquiry?._id) {
+      selectedInquiryIdRef.current = selectedInquiry._id;
+    }
+  }, [selectedInquiry?._id]);
+
+  // Deterministic stable sorting by lastMessageAt descending with ID fallback
+  const sortInquiries = (list) => {
+    return [...list].sort((a, b) => {
+      const timeA = new Date(a.lastMessageAt || a.createdAt || 0).getTime();
+      const timeB = new Date(b.lastMessageAt || b.createdAt || 0).getTime();
+      if (timeB !== timeA) return timeB - timeA;
+      return String(b._id).localeCompare(String(a._id));
+    });
+  };
 
   const fetchInquiries = async () => {
     try {
       const data = await api.inquiries.getMyInquiries();
       if (data.success) {
-        setInquiries(data.inquiries);
-        if (data.inquiries.length > 0 && !selectedInquiry) {
-          setSelectedInquiry(data.inquiries[0]);
-        } else if (selectedInquiry) {
-          const updated = data.inquiries.find((i) => i._id === selectedInquiry._id);
-          if (updated) setSelectedInquiry(updated);
-        }
+        const sorted = sortInquiries(data.inquiries);
+        setInquiries(sorted);
+
+        // Keep existing selected inquiry updated without jumping to first item
+        setSelectedInquiry((prev) => {
+          const currentId = selectedInquiryIdRef.current || prev?._id;
+          if (currentId) {
+            const found = sorted.find((i) => i._id === currentId);
+            if (found) {
+              return found;
+            }
+          }
+          // Only auto-select sorted[0] on initial load if nothing is selected
+          if (!selectedInquiryIdRef.current && !prev && sorted.length > 0) {
+            selectedInquiryIdRef.current = sorted[0]._id;
+            return sorted[0];
+          }
+          return prev || (sorted[0] || null);
+        });
       }
     } catch (err) {
       console.error('Failed to load inquiries:', err);
@@ -48,10 +78,15 @@ export const InquiriesPage = () => {
 
   useEffect(() => {
     fetchInquiries();
-    // Poll every 8 seconds for new messages in active thread
     const interval = setInterval(fetchInquiries, 8000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleSelectInquiry = (inq) => {
+    selectedInquiryIdRef.current = inq._id;
+    setSelectedInquiry(inq);
+    setShowChatMobile(true);
+  };
 
   const handleSendMessage = async (textToSend) => {
     const text = textToSend || messageText.trim();
@@ -62,11 +97,14 @@ export const InquiriesPage = () => {
       const data = await api.inquiries.sendMessage(selectedInquiry._id, text);
       if (data.success) {
         setMessageText('');
+        selectedInquiryIdRef.current = data.inquiry._id;
         setSelectedInquiry(data.inquiry);
-        // update inquiry in master list
-        setInquiries((prev) =>
-          prev.map((i) => (i._id === data.inquiry._id ? data.inquiry : i))
-        );
+
+        // Legitimately moves to index 0 ONLY when a new message is posted
+        setInquiries((prev) => {
+          const remaining = prev.filter((i) => i._id !== data.inquiry._id);
+          return [data.inquiry, ...remaining];
+        });
       }
     } catch (err) {
       showToast(err.message || 'Failed to send message', 'error');
@@ -95,178 +133,145 @@ export const InquiriesPage = () => {
       case 'declined':
         return <span className="badge badge-poor"><XCircle size={12} /> Declined</span>;
       case 'completed':
-        return <span className="badge badge-like-new"><CheckCircle size={12} /> Handover Done</span>;
+        return <span className="badge badge-like-new"><CheckCheck size={12} /> Completed</span>;
       default:
-        return <span className="badge badge-fair"><Clock size={12} /> Pending Offer</span>;
+        return <span className="badge badge-good"><Clock size={12} /> Pending</span>;
     }
   };
 
-  const quickPresets = [
-    'Can we meet at the Library Quad Atrium at 3:00 PM?',
-    'I have cash ready. Can we finalize today?',
-    'Are the page annotations minimal as described?',
-    'I accept your proposed handover window!'
-  ];
+  const isSeller = (inq) => {
+    if (!inq || !user) return false;
+    const sellerId = typeof inq.seller === 'string' ? inq.seller : inq.seller?._id;
+    return sellerId === user._id;
+  };
+
+  const getOtherParty = (inq) => {
+    if (!inq || !user) return null;
+    return isSeller(inq) ? inq.buyer : inq.seller;
+  };
+
+  const formatTimeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diffMs = Date.now() - new Date(dateStr).getTime();
+    const diffMins = Math.floor(diffMs / (60 * 1000));
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+  };
 
   return (
-    <div style={{ padding: '2.5rem 0 4rem' }}>
+    <div style={{ padding: '2rem 0 4rem' }}>
       <div className="content-wrapper">
-        <div style={{ marginBottom: '2.2rem' }}>
-          <div className="hero-badge-tag" style={{ marginBottom: '0.6rem' }}>
-            <MessageSquare size={14} color="var(--accent-gold)" /> PEER NEGOTIATION & QUAD HANDOVER
+        <div style={{ marginBottom: '1.75rem' }}>
+          <div style={{ fontSize: '0.74rem', color: 'var(--accent-terracotta)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'var(--font-mono)', marginBottom: '0.35rem' }}>
+            CAMPUS DISPATCH
           </div>
-          <h1 className="font-display" style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>
-            Campus Offers & Handover Salon
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.2rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '0.35rem' }}>
+            Messages & Handover Offers
           </h1>
-          <p className="font-serif-literary" style={{ fontSize: '1.25rem', maxWidth: '720px' }}>
-            Coordinate verified university quad handovers, negotiate fair student pricing, and finalize
-            exchanges safely without third-party platform markups.
+          <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)' }}>
+            Coordinate in-person campus exchanges, confirm offer prices, and lock in meeting spots.
           </p>
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '5rem 0' }}>
-            <div
-              style={{
-                display: 'inline-block',
-                width: '40px',
-                height: '40px',
-                border: '3px solid rgba(124, 58, 237, 0.2)',
-                borderTopColor: 'var(--primary)',
-                borderRadius: '50%',
-                animation: 'spin 0.8s linear infinite'
-              }}
-            />
-            <p style={{ marginTop: '1rem', color: 'var(--text-secondary)' }}>
-              Retrieving active negotiations...
-            </p>
+          <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-muted)' }}>
+            Loading messages...
           </div>
         ) : inquiries.length === 0 ? (
-          <div className="glass-panel" style={{ textAlign: 'center', padding: '4.5rem 2rem' }}>
-            <MessageSquare size={48} color="var(--accent-gold)" style={{ margin: '0 auto 1.2rem' }} />
-            <h3 className="font-display">No Active Negotiations Recorded</h3>
-            <p style={{ maxWidth: '440px', margin: '0.6rem auto 1.5rem', color: 'var(--text-secondary)' }}>
-              When you propose an offer on a volume in The Codex Exchange or a fellow scholar inquires about
-              your monograph, your active thread will materialize here.
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '4rem 1.5rem',
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-md)'
+            }}
+          >
+            <MessageSquare size={36} style={{ margin: '0 auto 0.75rem', color: 'var(--text-muted)' }} />
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '0.25rem' }}>
+              No messages yet
+            </h3>
+            <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
+              When someone asks about your book or you message a seller, your chats will appear here.
             </p>
           </div>
         ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(300px, 1fr) minmax(400px, 2fr)',
-              gap: '1.8rem',
-              minHeight: '640px'
-            }}
-            className="inquiries-layout"
-          >
-            {/* Left: Inquiries List */}
-            <div
-              className="glass-panel"
-              style={{ padding: '1.2rem', overflowY: 'auto', maxHeight: '740px', borderRadius: 'var(--radius-lg)' }}
-            >
-              <div
-                style={{
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  marginBottom: '1rem',
-                  padding: '0.4rem 0.6rem',
-                  borderBottom: '1px solid var(--border-subtle)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}
-              >
-                <span>Active Channels ({inquiries.length})</span>
-                <span style={{ fontSize: '0.74rem', color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <span className="pulse-dot" style={{ width: '6px', height: '6px' }}></span> Live Synchronized
+          <div className="inquiries-container">
+            {/* Left Column: Inquiry Threads List */}
+            <div className={`inquiries-list-col ${showChatMobile ? 'mobile-hidden' : ''}`}>
+              <div className="inquiries-list-header">
+                <span>Conversations ({inquiries.length})</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 400 }}>
+                  Active offers
                 </span>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              <div className="inquiries-list-scroll">
                 {inquiries.map((inq) => {
+                  const otherParty = getOtherParty(inq);
                   const isSelected = selectedInquiry?._id === inq._id;
-                  const otherParty =
-                    inq.buyer?._id === user?._id ? inq.seller : inq.buyer;
-                  const isUserSeller = inq.seller?._id === user?._id;
+                  const sellerMode = isSeller(inq);
+                  const lastTime = formatTimeAgo(inq.lastMessageAt || inq.createdAt);
 
                   return (
                     <div
                       key={inq._id}
-                      style={{
-                        padding: '1rem',
-                        borderRadius: '12px',
-                        background: isSelected
-                          ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.16) 0%, rgba(212, 175, 55, 0.08) 100%)'
-                          : 'rgba(255, 255, 255, 0.02)',
-                        border: isSelected
-                          ? '1px solid var(--border-gold)'
-                          : '1px solid var(--border-subtle)',
-                        cursor: 'pointer',
-                        transition: 'all 0.18s ease'
-                      }}
-                      onClick={() => setSelectedInquiry(inq)}
+                      onClick={() => handleSelectInquiry(inq)}
+                      className={`inquiry-thread-item ${isSelected ? 'selected' : ''}`}
                     >
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          marginBottom: '0.5rem'
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: '0.72rem',
-                            fontWeight: 800,
-                            letterSpacing: '0.06em',
-                            color: isUserSeller ? 'var(--accent-gold)' : 'var(--primary-light)'
-                          }}
-                        >
-                          {isUserSeller ? 'INCOMING OFFER' : 'OUTGOING PROPOSAL'}
-                        </span>
-                        {getStatusBadge(inq.status)}
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
                         <img
                           src={inq.book?.coverImage || '/covers/cover_placeholder.jpg'}
                           alt={inq.book?.title}
                           style={{
-                            width: '42px',
-                            height: '56px',
-                            borderRadius: '6px',
+                            width: '44px',
+                            height: '58px',
+                            borderRadius: 'var(--radius-sm)',
                             objectFit: 'cover',
-                            border: '1px solid var(--border-subtle)'
+                            border: '1px solid var(--border-subtle)',
+                            flexShrink: 0
                           }}
                         />
                         <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.2rem' }}>
+                            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                              {sellerMode ? 'Offer from' : 'Seller'}: <strong>{otherParty?.name?.split(' ')[0]}</strong>
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                                {lastTime}
+                              </span>
+                              {getStatusBadge(inq.status)}
+                            </div>
+                          </div>
+
                           <div
-                            className="font-serif-literary"
                             style={{
-                              fontSize: '0.98rem',
-                              fontWeight: 700,
+                              fontSize: '0.88rem',
+                              fontWeight: 600,
+                              color: 'var(--text-primary)',
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
-                              textOverflow: 'ellipsis'
+                              textOverflow: 'ellipsis',
+                              marginBottom: '0.2rem'
                             }}
                           >
                             {inq.book?.title}
                           </div>
-                          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                            with {otherParty?.name} • <strong className="font-mono" style={{ color: 'var(--text-primary)' }}>${inq.offeredPrice}</strong>
-                          </div>
-                          <div
-                            style={{
-                              fontSize: '0.76rem',
-                              color: 'var(--text-muted)',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              marginTop: '0.2rem'
-                            }}
-                          >
-                            {inq.messages?.[inq.messages.length - 1]?.text || 'Negotiation opened'}
+
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', fontSize: '0.8rem' }}>
+                            <span className="font-mono" style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+                              Offer: {formatINR(inq.offeredPrice)}
+                            </span>
+                            {inq.book?.price && (
+                              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                                (Listed: {formatINR(inq.book.price)})
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -276,235 +281,162 @@ export const InquiriesPage = () => {
               </div>
             </div>
 
-            {/* Right: Active Handover Negotiation Channel */}
-            {selectedInquiry ? (
-              <div
-                className="glass-panel"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
-                  height: '740px',
-                  borderRadius: 'var(--radius-lg)',
-                  border: '1px solid var(--border-gold)'
-                }}
-              >
-                {/* Handover Agreement Card Header */}
-                <div
-                  style={{
-                    padding: '1.2rem 1.6rem',
-                    borderBottom: '1px solid var(--border-subtle)',
-                    background: 'radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.08) 0%, rgba(10, 14, 24, 0.85) 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: '1rem'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <img
-                      src={selectedInquiry.book?.coverImage || '/covers/cover_placeholder.jpg'}
-                      alt={selectedInquiry.book?.title}
-                      style={{ width: '48px', height: '64px', borderRadius: '6px', objectFit: 'cover', border: '1px solid var(--border-gold)' }}
-                    />
-                    <div>
-                      <h3 className="font-serif-literary" style={{ fontSize: '1.25rem', marginBottom: '0.2rem' }}>
-                        {selectedInquiry.book?.title}
-                      </h3>
-                      <div
-                        style={{
-                          fontSize: '0.84rem',
-                          color: 'var(--text-secondary)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.8rem',
-                          flexWrap: 'wrap'
-                        }}
-                      >
-                        <span>
-                          Proposed Price:{' '}
-                          <strong className="font-mono" style={{ color: 'var(--accent-gold)', fontSize: '0.95rem' }}>
-                            ${selectedInquiry.offeredPrice}
-                          </strong>
-                        </span>
-                        <span>•</span>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                          <MapPin size={13} color="var(--accent-gold)" />
-                          {selectedInquiry.proposedLocation}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Seller Status Actions */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                    {selectedInquiry.seller?._id === user?._id &&
-                      selectedInquiry.status === 'pending' && (
-                        <>
-                          <button
-                            type="button"
-                            className="btn btn-primary btn-sm"
-                            onClick={() => handleStatusChange('accepted')}
-                            style={{ padding: '0.45rem 0.95rem', borderRadius: '8px' }}
-                          >
-                            <CheckCircle size={14} /> Accept Offer
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-secondary btn-sm"
-                            onClick={() => handleStatusChange('declined')}
-                            style={{ padding: '0.45rem 0.95rem', borderRadius: '8px' }}
-                          >
-                            <XCircle size={14} /> Decline
-                          </button>
-                        </>
-                      )}
-
-                    {selectedInquiry.status === 'accepted' && (
-                      <button
-                        type="button"
-                        className="btn btn-accent btn-sm"
-                        onClick={() => handleStatusChange('completed')}
-                        style={{ padding: '0.45rem 0.95rem', borderRadius: '8px' }}
-                      >
-                        <CheckCircle size={14} /> Mark Handover Completed
-                      </button>
-                    )}
-
+            {/* Right Column: Chat Window & Offer Controls */}
+            <div className={`inquiries-chat-col ${!showChatMobile ? 'mobile-hidden' : ''}`}>
+              {selectedInquiry ? (
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  {/* Mobile Back Bar */}
+                  <div className="mobile-chat-nav-bar">
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => setShowChatMobile(false)}
+                      style={{ padding: '0.4rem 0.6rem', gap: '0.4rem', fontSize: '0.85rem' }}
+                    >
+                      <ArrowLeft size={16} /> All Conversations
+                    </button>
                     {getStatusBadge(selectedInquiry.status)}
                   </div>
-                </div>
 
-                {/* Messages Box */}
-                <div
-                  style={{
-                    flex: 1,
-                    overflowY: 'auto',
-                    padding: '1.6rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1rem'
-                  }}
-                >
-                  {selectedInquiry.messages?.map((msg, i) => {
-                    const isMe = (msg.sender?._id || msg.sender) === user?._id;
-                    const senderObj =
-                      isMe ? user : selectedInquiry.buyer?._id === user?._id ? selectedInquiry.seller : selectedInquiry.buyer;
-
-                    return (
-                      <div
-                        key={i}
-                        style={{
-                          display: 'flex',
-                          gap: '0.75rem',
-                          alignSelf: isMe ? 'flex-end' : 'flex-start',
-                          maxWidth: '75%',
-                          flexDirection: isMe ? 'row-reverse' : 'row'
-                        }}
-                      >
-                        <img
-                          src={
-                            senderObj?.avatar ||
-                            `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(senderObj?.name || 'Student')}`
-                          }
-                          alt="avatar"
+                  {/* Header */}
+                  <div className="inquiry-chat-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flex: 1, minWidth: 0 }}>
+                      <img
+                        src={selectedInquiry.book?.coverImage || '/covers/cover_placeholder.jpg'}
+                        alt={selectedInquiry.book?.title}
+                        style={{ width: '42px', height: '54px', borderRadius: 'var(--radius-sm)', objectFit: 'cover', flexShrink: 0 }}
+                      />
+                      <div style={{ minWidth: 0 }}>
+                        <div
                           style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '50%',
-                            objectFit: 'cover',
-                            marginTop: '4px',
-                            border: '1px solid var(--border-gold)'
+                            fontSize: '0.94rem',
+                            fontWeight: 600,
+                            color: 'var(--text-primary)',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
                           }}
-                        />
-                        <div>
-                          <div
-                            style={{
-                              fontSize: '0.75rem',
-                              color: 'var(--text-muted)',
-                              marginBottom: '0.25rem',
-                              textAlign: isMe ? 'right' : 'left'
-                            }}
+                        >
+                          {selectedInquiry.book?.title}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                          Offer: <strong className="font-mono" style={{ color: 'var(--text-primary)' }}>{formatINR(selectedInquiry.offeredPrice)}</strong>
+                          <span className="hide-on-mobile"> • Meet at {selectedInquiry.proposedLocation}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Seller Action Controls */}
+                    {isSeller(selectedInquiry) && (
+                      <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0 }}>
+                        {selectedInquiry.status === 'pending' && (
+                          <>
+                            <button
+                              className="btn btn-primary btn-sm"
+                              onClick={() => handleStatusChange('accepted')}
+                            >
+                              Accept Offer
+                            </button>
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              onClick={() => handleStatusChange('declined')}
+                            >
+                              Decline
+                            </button>
+                          </>
+                        )}
+                        {selectedInquiry.status === 'accepted' && (
+                          <button
+                            className="btn btn-primary btn-sm"
+                            onClick={() => handleStatusChange('completed')}
                           >
-                            {isMe ? 'You (Verified)' : senderObj?.name}
+                            Mark Completed
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Location notice on mobile */}
+                  <div className="show-on-mobile" style={{ padding: '0.5rem 1rem', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    <MapPin size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
+                    Meeting spot: <strong style={{ color: 'var(--text-secondary)' }}>{selectedInquiry.proposedLocation}</strong>
+                  </div>
+
+                  {/* Messages Thread */}
+                  <div className="inquiry-messages-scroll">
+                    {selectedInquiry.messages?.map((msg, idx) => {
+                      const senderId = typeof msg.sender === 'string' ? msg.sender : msg.sender?._id;
+                      const isMe = senderId === user?._id;
+                      const senderName = isMe ? 'You' : getOtherParty(selectedInquiry)?.name?.split(' ')[0] || 'Student';
+
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: isMe ? 'flex-end' : 'flex-start'
+                          }}
+                        >
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
+                            {senderName} • {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
                           <div
                             style={{
-                              background: isMe ? 'linear-gradient(135deg, var(--primary) 0%, #5b21b6 100%)' : 'rgba(255, 255, 255, 0.06)',
-                              color: '#ffffff',
-                              padding: '0.8rem 1.1rem',
-                              borderRadius: isMe
-                                ? '16px 16px 4px 16px'
-                                : '16px 16px 16px 4px',
-                              fontSize: '0.92rem',
+                              maxWidth: '85%',
+                              padding: '0.65rem 0.95rem',
+                              borderRadius: 'var(--radius-md)',
+                              fontSize: '0.88rem',
                               lineHeight: 1.5,
-                              boxShadow: 'var(--shadow-sm)',
+                              wordBreak: 'break-word',
+                              overflowWrap: 'anywhere',
+                              background: isMe ? 'var(--btn-primary-bg)' : 'var(--bg-secondary)',
+                              color: isMe ? 'var(--btn-primary-text)' : 'var(--text-primary)',
                               border: isMe ? 'none' : '1px solid var(--border-subtle)'
                             }}
                           >
                             {msg.text}
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Quick Negotiation Preset Chips */}
-                <div style={{ padding: '0.6rem 1.4rem', borderTop: '1px solid var(--border-subtle)', background: 'rgba(0,0,0,0.2)' }}>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.4rem', letterSpacing: '0.04em' }}>
-                    QUICK HANDOVER PHRASES:
+                      );
+                    })}
                   </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                    {quickPresets.map((preset, idx) => (
+
+                  {/* Input Area */}
+                  <div className="inquiry-input-area">
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }}
+                      style={{ display: 'flex', gap: '0.5rem' }}
+                    >
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Type a message (e.g. Can meet in 15 mins)..."
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
+                        style={{ fontSize: '0.88rem' }}
+                      />
                       <button
-                        key={idx}
-                        type="button"
-                        className="quick-chip"
-                        onClick={() => handleSendMessage(preset)}
+                        type="submit"
+                        className="btn btn-accent"
+                        disabled={sending || !messageText.trim()}
+                        style={{ padding: '0.65rem 1.15rem', whiteSpace: 'nowrap' }}
                       >
-                        {preset}
+                        <Send size={15} /> <span className="hide-on-mobile">Send</span>
                       </button>
-                    ))}
+                    </form>
                   </div>
                 </div>
-
-                {/* Send Message Form */}
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }}
-                  style={{
-                    padding: '1rem 1.4rem',
-                    borderTop: '1px solid var(--border-subtle)',
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.8rem'
-                  }}
-                >
-                  <input
-                    type="text"
-                    required
-                    placeholder="Type message to agree on campus quad meetup time or price..."
-                    className="form-input"
-                    style={{ borderRadius: '999px', fontSize: '0.9rem' }}
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                  />
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={sending}
-                    style={{ borderRadius: '999px', padding: '0.75rem 1.3rem' }}
-                  >
-                    {sending ? 'Sending...' : <Send size={16} />}
-                  </button>
-                </form>
-              </div>
-            ) : null}
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', padding: '3rem', height: '100%' }}>
+                  Select a message on the left to start chatting
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

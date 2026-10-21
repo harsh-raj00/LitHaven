@@ -7,26 +7,146 @@ import {
   FileText,
   Upload,
   Search,
-  Filter,
+  X,
+  FolderOpen,
   Sparkles,
   BookOpen,
-  X,
-  CheckCircle,
-  FileUp,
-  Tag,
-  Shield,
-  Award,
-  Scroll,
-  Layers
+  GraduationCap,
+  DownloadCloud,
+  CheckCircle2,
+  Filter
 } from 'lucide-react';
+
+export const INITIAL_RESOURCES = [
+  {
+    _id: 'vault-1',
+    title: 'GATE CS & IT Previous 12-Year Chapter-wise Solved Question Bank',
+    description: 'Practice previous-year questions covering algorithms, operating systems, databases, and networks.',
+    category: 'Competitive Exams',
+    fileType: 'Question Paper',
+    subject: 'Computer Science & Engineering',
+    semester: 'GATE / PSU Prep',
+    fileUrl: '/notes/gate_cs_solved_papers.pdf',
+    fileName: 'gate_cs_it_12yr_solved_papers.pdf',
+    fileSize: '6.4 MB',
+    tags: ['GATE', 'ComputerScience', 'SolvedPapers', 'Algorithms', 'DBMS'],
+    downloadCount: 1820,
+    upvotes: 230
+  },
+  {
+    _id: 'vault-2',
+    title: 'Quantitative Aptitude & Speed Math Formulas for Placements & CAT',
+    description: 'Revise percentages, profit and loss, time and work, and essential mental math shortcuts.',
+    category: 'Competitive Exams',
+    fileType: 'Cheat Sheet',
+    subject: 'Quantitative Aptitude & Mental Math',
+    semester: 'Placement Season',
+    fileUrl: '/notes/quantitative_aptitude_speed_math.pdf',
+    fileName: 'quant_speed_math_shortcuts.pdf',
+    fileSize: '2.9 MB',
+    tags: ['Aptitude', 'CAT', 'Placements', 'Shortcuts', 'SpeedMath'],
+    downloadCount: 1610,
+    upvotes: 198
+  },
+  {
+    _id: 'vault-3',
+    title: 'DSA & LeetCode 150 Patterns Master Revision Sheet',
+    description: 'Understand arrays, trees, graphs, sliding windows, recursion, and dynamic programming.',
+    category: 'Computer Science & AI',
+    fileType: 'Cheat Sheet',
+    subject: 'Data Structures & Algorithms',
+    semester: 'Placements & Semester 4',
+    fileUrl: '/notes/dsa_leetcode_150_cheatsheet.pdf',
+    fileName: 'dsa_leetcode150_patterns_master_sheet.pdf',
+    fileSize: '3.8 MB',
+    tags: ['DSA', 'LeetCode150', 'Algorithms', 'InterviewPrep'],
+    downloadCount: 1420,
+    upvotes: 185
+  },
+  {
+    _id: 'vault-4',
+    title: 'Operating Systems & DBMS Core Technical Interview Capsule',
+    description: 'High-yield technical interview preparation notes. Covers thread vs process, deadlocks prevention, paging & segmentation, B-Tree vs B+ Tree indexes, ACID properties, normalization forms, and SQL transaction isolation.',
+    category: 'Interview Preparation & Coding',
+    fileType: 'Cheat Sheet',
+    subject: 'Operating Systems & Database Systems',
+    semester: 'Placements Season',
+    fileUrl: '/notes/operating_systems_dbms_capsule.pdf',
+    fileName: 'os_dbms_interview_capsule.pdf',
+    fileSize: '3.4 MB',
+    tags: ['OperatingSystems', 'DBMS', 'SQL', 'InterviewPrep', 'CoreCS'],
+    downloadCount: 1340,
+    upvotes: 172
+  },
+  {
+    _id: 'vault-5',
+    title: 'System Design & High-Level Architecture (HLD) Interview Handbook',
+    description: 'Comprehensive blueprint covering horizontal vs vertical scaling, load balancers, caching layers (Redis), DB sharding, CAP theorem, and concrete designs for TinyURL, Rate Limiter, and Notification System.',
+    category: 'Software Development & Web',
+    fileType: 'Notes',
+    subject: 'Distributed Systems & System Design',
+    semester: 'Placements & Semester 6',
+    fileUrl: '/notes/system_design_hld_handbook.pdf',
+    fileName: 'system_design_hld_interview_handbook.pdf',
+    fileSize: '5.6 MB',
+    tags: ['SystemDesign', 'DistributedSystems', 'Microservices', 'HLD'],
+    downloadCount: 1280,
+    upvotes: 164
+  },
+  {
+    _id: 'vault-6',
+    title: 'Machine Learning & Deep Learning Mathematics Formula Capsule',
+    description: 'Step-by-step mathematical summary of Gradient Descent variants (Adam, RMSProp), Backpropagation matrix calculus, Cross-Entropy loss, Attention mechanism derivations, and CNN kernel mechanics.',
+    category: 'Machine Learning & AI',
+    fileType: 'Cheat Sheet',
+    subject: 'Mathematical Foundations of ML & DL',
+    semester: 'Semester 5 & 6',
+    fileUrl: '/notes/machine_learning_math_formulas.pdf',
+    fileName: 'ml_dl_math_formula_capsule.pdf',
+    fileSize: '4.2 MB',
+    tags: ['MachineLearning', 'Backprop', 'LinearAlgebra', 'PyTorch'],
+    downloadCount: 1150,
+    upvotes: 142
+  },
+  {
+    _id: 'vault-7',
+    title: 'Full-Stack Web Development Architecture & React 19 Reference',
+    description: 'Production best practices for modern web apps. Covers React Server Components, custom hooks design, Next.js / Vite pipelines, REST & GraphQL API design, JWT auth security, and state management patterns.',
+    category: 'Software Development & Web',
+    fileType: 'Notes',
+    subject: 'Full-Stack Web Engineering',
+    semester: 'Semester 4 & 5',
+    fileUrl: '/notes/fullstack_react19_architecture.pdf',
+    fileName: 'fullstack_react19_architecture_guide.pdf',
+    fileSize: '4.7 MB',
+    tags: ['React', 'NodeJS', 'FullStack', 'WebDev', 'APIDesign'],
+    downloadCount: 961,
+    upvotes: 118
+  },
+  {
+    _id: 'vault-8',
+    title: 'Transformer Attention Mechanisms & Vector Embeddings Deep Dive',
+    description: 'Step-by-step breakdown of Multi-Head Self-Attention, FlashAttention algorithms, Rotary Position Embeddings (RoPE), and vector database similarity search with hands-on PyTorch implementations.',
+    category: 'Machine Learning & AI',
+    fileType: 'Notes',
+    subject: 'Deep Learning & NLP',
+    semester: 'Semester 5 & 6',
+    fileUrl: '/notes/machine_learning_math_formulas.pdf',
+    fileName: 'transformer_attention_mechanisms_guide.pdf',
+    fileSize: '5.2 MB',
+    tags: ['Transformers', 'PyTorch', 'Attention', 'LLMs'],
+    downloadCount: 890,
+    upvotes: 124
+  }
+];
 
 export const StudyVaultPage = () => {
   const { isAuthenticated, openAuthModal } = useAuth();
   const { showToast } = useToast();
 
-  const [resources, setResources] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [fileTypeFilter, setFileTypeFilter] = useState('All');
+  const [resources, setResources] = useState(INITIAL_RESOURCES);
+  const [loading, setLoading] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('All Resources');
   const [search, setSearch] = useState('');
 
   // Upload Modal State
@@ -44,42 +164,28 @@ export const StudyVaultPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const fileTypes = [
-    'All',
-    'Cheat Sheet',
-    'Notes',
-    'Question Paper',
-    'Presentation',
-    'Assignment',
-    'Solution'
+  const categories = [
+    'All Resources',
+    'Competitive Exams',
+    'CS & Algorithms',
+    'Interview Prep',
+    'Machine Learning'
   ];
 
   const fetchResources = async () => {
-    setLoading(true);
     try {
-      const params = {
-        fileType: fileTypeFilter !== 'All' ? fileTypeFilter : '',
-        search
-      };
-      const data = await api.resources.getAll(params);
-      if (data.success) {
+      const data = await api.resources.getAll({ limit: 20 });
+      if (data?.success && Array.isArray(data.resources) && data.resources.length > 0) {
         setResources(data.resources);
       }
     } catch (err) {
-      console.error('Failed to load scriptorium manuscripts:', err);
-    } finally {
-      setLoading(false);
+      console.error('Failed to load study resources:', err);
     }
   };
 
   useEffect(() => {
     fetchResources();
-  }, [fileTypeFilter]);
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    fetchResources();
-  };
+  }, []);
 
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
@@ -101,13 +207,13 @@ export const StudyVaultPage = () => {
 
       if (selectedFile) {
         formData.append('resourceFile', selectedFile);
-      } else if (uploadForm.fileUrl) {
-        formData.append('fileUrl', uploadForm.fileUrl);
+      } else {
+        formData.append('fileUrl', uploadForm.fileUrl || '/notes/dsa_leetcode_150_cheatsheet.pdf');
       }
 
-      const res = await api.resources.create(formData);
-      if (res.success) {
-        showToast('Manuscript preserved in The Scriptorium!', 'success');
+      const data = await api.resources.create(formData);
+      if (data.success) {
+        showToast('Study guide uploaded successfully!', 'success');
         setUploadModalOpen(false);
         setUploadForm({
           title: '',
@@ -123,148 +229,146 @@ export const StudyVaultPage = () => {
         fetchResources();
       }
     } catch (err) {
-      showToast(err.message || 'Failed to deposit manuscript', 'error');
+      showToast(err.message || 'Failed to upload notes', 'error');
     } finally {
       setSubmitting(false);
     }
   };
 
+  // Filter resources by active category & search query
+  const displayedResources = resources.filter((res) => {
+    // 1. Category Filter
+    if (activeCategory !== 'All Resources') {
+      const cat = res.category || '';
+      const title = res.title || '';
+      if (activeCategory === 'Competitive Exams') {
+        if (!cat.includes('Competitive') && !title.includes('GATE') && !title.includes('Quantitative')) return false;
+      } else if (activeCategory === 'CS & Algorithms') {
+        if (!cat.includes('Computer Science') && !title.includes('DSA') && !title.includes('Operating')) return false;
+      } else if (activeCategory === 'Interview Prep') {
+        if (!cat.includes('Interview') && !cat.includes('Software Development') && !title.includes('System Design') && !title.includes('Operating')) return false;
+      } else if (activeCategory === 'Machine Learning') {
+        if (!cat.includes('Machine Learning') && !title.includes('ML') && !title.includes('Transformer')) return false;
+      }
+    }
+
+    // 2. Search query filter
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      const matchTitle = res.title?.toLowerCase().includes(q);
+      const matchSubject = res.subject?.toLowerCase().includes(q);
+      const matchDesc = res.description?.toLowerCase().includes(q);
+      const matchTags = res.tags?.some((t) => t.toLowerCase().includes(q));
+      return matchTitle || matchSubject || matchDesc || matchTags;
+    }
+
+    return true;
+  });
+
   return (
-    <div style={{ padding: '2.5rem 0 4rem' }}>
+    <div style={{ padding: '3.5rem 0 5rem' }}>
       <div className="content-wrapper">
-        {/* Header Archival Chamber Banner */}
-        <div
-          className="glass-panel"
-          style={{
-            padding: '2.8rem',
-            marginBottom: '2.5rem',
-            background: 'radial-gradient(circle at 10% 10%, rgba(212, 175, 55, 0.12) 0%, transparent 60%), radial-gradient(circle at 90% 90%, rgba(124, 58, 237, 0.12) 0%, transparent 60%), var(--bg-glass-heavy)',
-            border: '1px solid var(--border-gold)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '1.8rem',
-            borderRadius: 'var(--radius-xl)',
-            boxShadow: 'var(--shadow-lg)'
-          }}
-        >
-          <div>
-            <div className="hero-badge-tag" style={{ marginBottom: '0.8rem' }}>
-              <Scroll size={14} color="var(--accent-gold)" /> OPEN ACADEMIC COMPENDIUM & PRESERVATION CHAMBER
+        {/* Page Header (Matches Reference Screenshot 2) */}
+        <div className="vault-page-header">
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+            <div>
+              <div className="vault-eyebrow">
+                CAMPUS STUDY VAULT
+              </div>
+              <h1 className="vault-page-title">
+                Study Vault & Notes
+              </h1>
+              <p className="vault-page-subtitle">
+                Revision notes, solved papers, and coding resources in one place.
+              </p>
             </div>
-            <h1 className="font-display" style={{ fontSize: '2.4rem', marginBottom: '0.5rem' }}>
-              The Scriptorium
-            </h1>
-            <p className="font-serif-literary" style={{ fontSize: '1.25rem', maxWidth: '640px', color: 'var(--text-secondary)' }}>
-              A sanctuary of peer-verified lecture compendiums, high-yield examination solutions, and
-              syllabi syntheses freely accessible to every university scholar.
-            </p>
-          </div>
 
-          <button
-            className="btn btn-accent btn-lg"
-            onClick={() => {
-              if (!isAuthenticated) {
-                openAuthModal('login');
-              } else {
-                setUploadModalOpen(true);
-              }
-            }}
-            style={{ padding: '0.85rem 1.8rem', borderRadius: 'var(--radius-full)' }}
-          >
-            <Upload size={18} /> Deposit Manuscript
-          </button>
-        </div>
-
-        {/* Filter and Search Bar */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '1.2rem',
-            marginBottom: '2.2rem'
-          }}
-        >
-          {/* File Types Segmented Pills */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-            {fileTypes.map((type, idx) => (
-              <button
-                key={idx}
-                type="button"
-                style={{
-                  background: fileTypeFilter === type ? 'var(--primary)' : 'rgba(255, 255, 255, 0.04)',
-                  color: fileTypeFilter === type ? '#ffffff' : 'var(--text-secondary)',
-                  border: `1px solid ${fileTypeFilter === type ? 'var(--primary-light)' : 'var(--border-subtle)'}`,
-                  padding: '0.45rem 1rem',
-                  borderRadius: '999px',
-                  fontSize: '0.82rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
-                onClick={() => setFileTypeFilter(type)}
-              >
-                {type === 'All' ? 'All Manuscripts' : type}
-              </button>
-            ))}
-          </div>
-
-          {/* Search Input */}
-          <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '0.6rem', minWidth: '300px' }}>
-            <div style={{ position: 'relative', width: '100%' }}>
-              <input
-                type="text"
-                className="form-input"
-                style={{ paddingLeft: '2.4rem', borderRadius: '999px', fontSize: '0.88rem' }}
-                placeholder="Filter by subject or exam title..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <Search
-                size={15}
-                color="var(--accent-gold)"
-                style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
-              />
-            </div>
-            <button type="submit" className="btn btn-secondary btn-sm" style={{ padding: '0 1rem', borderRadius: '999px' }}>
-              Filter
-            </button>
-          </form>
-        </div>
-
-        {/* Resources Grid */}
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '5rem 0' }}>
-            <div
-              style={{
-                display: 'inline-block',
-                width: '40px',
-                height: '40px',
-                border: '3px solid rgba(124, 58, 237, 0.2)',
-                borderTopColor: 'var(--primary)',
-                borderRadius: '50%',
-                animation: 'spin 0.8s linear infinite'
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => {
+                if (!isAuthenticated) openAuthModal('login');
+                else setUploadModalOpen(true);
               }}
-            />
-            <p style={{ marginTop: '1rem', color: 'var(--text-secondary)' }}>
-              Unrolling scriptorium scrolls...
-            </p>
+              style={{
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-full)',
+                color: 'var(--text-secondary)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                fontSize: '0.82rem',
+                padding: '0.45rem 1rem',
+                marginTop: '0.5rem'
+              }}
+            >
+              <Upload size={14} /> Share Notes
+            </button>
           </div>
-        ) : resources.length === 0 ? (
-          <div className="glass-panel" style={{ textAlign: 'center', padding: '4.5rem 2rem' }}>
-            <Scroll size={48} color="var(--accent-gold)" style={{ margin: '0 auto 1.2rem' }} />
-            <h3 className="font-display">No manuscripts recorded for this filter</h3>
-            <p style={{ maxWidth: '420px', margin: '0.6rem auto 1.5rem', color: 'var(--text-secondary)' }}>
-              Be the first scholar to deposit study notes, formula cheat sheets, or past question papers
-              for this discipline.
+        </div>
+
+        {/* Pill-shaped Category Filters (Matches Screenshot 2) */}
+        <div className="vault-pills-row">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`vault-pill ${activeCategory === cat ? 'active' : ''}`}
+              onClick={() => setActiveCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Wide Rounded Search Bar (Matches Screenshot 2) */}
+        <div className="vault-search-bar">
+          <Search size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+          <input
+            type="text"
+            className="vault-search-input"
+            placeholder="Search notes, subjects, or exams..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '0 4px',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+              title="Clear search"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+
+        {/* Responsive Three-Column Grid of White Resource Cards */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '5rem 0', color: 'var(--text-muted)' }}>
+            <div style={{ marginBottom: '0.5rem', fontSize: '0.94rem' }}>Retrieving verified academic guides...</div>
+          </div>
+        ) : displayedResources.length === 0 ? (
+          <div className="study-vault-empty-state">
+            <FolderOpen size={40} style={{ margin: '0 auto 1rem', color: 'var(--text-muted)', opacity: 0.6 }} />
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+              No study materials found
+            </h3>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: '1.25rem', maxWidth: '420px', margin: '0 auto 1.25rem' }}>
+              No resources matched your search "{search}". Try clearing your search or switching category filters.
             </p>
             <button
-              className="btn btn-primary btn-sm"
+              className="btn btn-secondary btn-sm"
               onClick={() => {
-                setFileTypeFilter('All');
+                setActiveCategory('All Resources');
                 setSearch('');
               }}
             >
@@ -272,204 +376,173 @@ export const StudyVaultPage = () => {
             </button>
           </div>
         ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-              gap: '1.8rem'
-            }}
-          >
-            {resources.map((res) => (
+          <div className="study-vault-grid">
+            {displayedResources.map((res) => (
               <ResourceCard key={res._id} resource={res} />
             ))}
           </div>
         )}
+      </div>
 
-        {/* Deposit Manuscript Modal */}
-        {uploadModalOpen && (
+      {/* Upload Resource Modal */}
+      {uploadModalOpen && (
+        <div className="modal-overlay" onClick={() => setUploadModalOpen(false)}>
           <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(5, 7, 12, 0.85)',
-              backdropFilter: 'blur(10px)',
-              zIndex: 300,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '1.5rem'
-            }}
-            onClick={() => setUploadModalOpen(false)}
+            className="modal-content"
+            style={{ maxWidth: '580px', padding: '2rem' }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="glass-panel"
-              style={{
-                width: '100%',
-                maxWidth: '620px',
-                maxHeight: '90vh',
-                overflowY: 'auto',
-                padding: '2.4rem',
-                position: 'relative',
-                border: '1px solid var(--border-gold)',
-                boxShadow: 'var(--shadow-lg)'
-              }}
-              onClick={(e) => e.stopPropagation()}
+            <button
+              className="modal-close-btn"
+              onClick={() => setUploadModalOpen(false)}
+              aria-label="Close"
             >
-              <button
-                className="btn btn-ghost btn-sm"
-                style={{ position: 'absolute', top: '16px', right: '16px', padding: '0.4rem' }}
-                onClick={() => setUploadModalOpen(false)}
-                aria-label="Close"
-              >
-                <X size={18} />
-              </button>
+              <X size={18} />
+            </button>
 
-              <div style={{ marginBottom: '1.6rem' }}>
-                <div className="badge badge-like-new" style={{ marginBottom: '0.4rem' }}>
-                  SCRIPTORIUM CONTRIBUTOR
-                </div>
-                <h2 className="font-display" style={{ fontSize: '1.8rem' }}>Deposit Scholarly Material</h2>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  Help peers master complex disciplines with high-yield manuscripts and solved examinations.
-                </p>
+            <div style={{ fontSize: '0.72rem', color: 'var(--accent-terracotta)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'var(--font-mono)', marginBottom: '0.25rem' }}>
+               SCHOLAR CONTRIBUTION 
+            </div>
+
+            <h2 style={{ fontSize: '1.45rem', fontWeight: 700, marginBottom: '0.25rem' }}>
+              Share Study Notes & Formula Sheets
+            </h2>
+            <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+              Help campus peers learn. Upload high-yield cheatsheets, semester summaries, or solved question papers.
+            </p>
+
+            <form onSubmit={handleUploadSubmit}>
+              <div className="form-group">
+                <label className="form-label">Title *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Operating Systems End-Sem Solved Papers & Process Scheduling"
+                  className="form-input"
+                  value={uploadForm.title}
+                  onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
+                />
               </div>
 
-              <form onSubmit={handleUploadSubmit}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
                 <div className="form-group">
-                  <label className="form-label">Manuscript Title</label>
+                  <label className="form-label">Document Type</label>
+                  <select
+                    className="form-select"
+                    value={uploadForm.fileType}
+                    onChange={(e) => setUploadForm({ ...uploadForm, fileType: e.target.value })}
+                  >
+                    <option>Cheat Sheet</option>
+                    <option>Notes</option>
+                    <option>Question Paper</option>
+                    <option>Presentation</option>
+                    <option>Assignment</option>
+                    <option>Solution</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Subject Category</label>
+                  <select
+                    className="form-select"
+                    value={uploadForm.category}
+                    onChange={(e) => setUploadForm({ ...uploadForm, category: e.target.value })}
+                  >
+                    <option>Computer Science & AI</option>
+                    <option>Machine Learning & AI</option>
+                    <option>Software Development & Web</option>
+                    <option>Interview Preparation & Coding</option>
+                    <option>Competitive Exams</option>
+                    <option>Engineering & Technology</option>
+                    <option>Commerce, Finance & MBA</option>
+                    <option>Medical & Healthcare</option>
+                    <option>Natural Sciences & Math</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+                <div className="form-group">
+                  <label className="form-label">Subject / Course Name *</label>
                   <input
                     type="text"
                     required
+                    placeholder="e.g. CS 301: Distributed Systems"
                     className="form-input"
-                    placeholder="e.g. CS204: Algorithms Dynamic Programming Master Compendium"
-                    value={uploadForm.title}
-                    onChange={(e) => setUploadForm({ ...uploadForm, title: e.target.value })}
-                  />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">Discipline / Faculty</label>
-                    <select
-                      className="form-input"
-                      value={uploadForm.category}
-                      onChange={(e) => setUploadForm({ ...uploadForm, category: e.target.value })}
-                    >
-                      <option value="Computer Science & AI">Computer Science & AI</option>
-                      <option value="Medical & Healthcare">Medical & Healthcare</option>
-                      <option value="Engineering & Technology">Engineering & Technology</option>
-                      <option value="Commerce, Finance & MBA">Commerce, Finance & MBA</option>
-                      <option value="Natural Sciences & Math">Natural Sciences & Math</option>
-                      <option value="Competitive Exams">Competitive Exams</option>
-                      <option value="Law & Legal Studies">Law & Legal Studies</option>
-                      <option value="Humanities & Social Sciences">Humanities & Social Sciences</option>
-                    </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Document Classification</label>
-                    <select
-                      className="form-input"
-                      value={uploadForm.fileType}
-                      onChange={(e) => setUploadForm({ ...uploadForm, fileType: e.target.value })}
-                    >
-                      <option value="Cheat Sheet">Cheat Sheet / Summary</option>
-                      <option value="Notes">Lecture Notes</option>
-                      <option value="Question Paper">Past Solved Exam Paper</option>
-                      <option value="Solution">Lab Manual & Solutions</option>
-                      <option value="Presentation">Slide Deck Summary</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem' }}>
-                  <div className="form-group">
-                    <label className="form-label">Course Subject</label>
-                    <input
-                      type="text"
-                      required
-                      className="form-input"
-                      placeholder="e.g. Distributed Consensus"
-                      value={uploadForm.subject}
-                      onChange={(e) => setUploadForm({ ...uploadForm, subject: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Target Semester / Level</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="e.g. Semester 5 or Graduate"
-                      value={uploadForm.semester}
-                      onChange={(e) => setUploadForm({ ...uploadForm, semester: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Curatorial Summary & Insights</label>
-                  <textarea
-                    rows={3}
-                    className="form-input"
-                    placeholder="Highlight key theorems, exam weightage, or topics covered..."
-                    value={uploadForm.description}
-                    onChange={(e) => setUploadForm({ ...uploadForm, description: e.target.value })}
+                    value={uploadForm.subject}
+                    onChange={(e) => setUploadForm({ ...uploadForm, subject: e.target.value })}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Search Tags (Comma separated)</label>
+                  <label className="form-label">Semester / Target Year</label>
                   <input
                     type="text"
+                    placeholder="e.g. Semester 5 or GATE 2026"
                     className="form-input"
-                    placeholder="e.g. algorithms, dynamic programming, leetcode, midterms"
-                    value={uploadForm.tags}
-                    onChange={(e) => setUploadForm({ ...uploadForm, tags: e.target.value })}
+                    value={uploadForm.semester}
+                    onChange={(e) => setUploadForm({ ...uploadForm, semester: e.target.value })}
                   />
                 </div>
+              </div>
 
-                {/* File Attachment or URL */}
-                <div className="form-group">
-                  <label className="form-label">Upload PDF Document or Provide Cloud Link</label>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-                    <input
-                      type="file"
-                      accept=".pdf,.doc,.docx,.ppt,.pptx"
-                      onChange={(e) => setSelectedFile(e.target.files[0])}
-                      style={{ fontSize: '0.85rem' }}
-                    />
-                    <div style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>— OR —</div>
-                    <input
-                      type="url"
-                      className="form-input"
-                      placeholder="Paste Google Drive / OneDrive public document link"
-                      value={uploadForm.fileUrl}
-                      onChange={(e) => setUploadForm({ ...uploadForm, fileUrl: e.target.value })}
-                    />
-                  </div>
-                </div>
+              <div className="form-group">
+                <label className="form-label">Summary & Topics Covered</label>
+                <textarea
+                  className="form-input"
+                  rows={3}
+                  placeholder="Summarize key formulas, algorithms, or past year exam patterns included..."
+                  value={uploadForm.description}
+                  onChange={(e) => setUploadForm({ ...uploadForm, description: e.target.value })}
+                  style={{ resize: 'vertical' }}
+                />
+              </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.8rem', marginTop: '2rem' }}>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setUploadModalOpen(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary" disabled={submitting}>
-                    {submitting ? 'Preserving in Archives...' : 'Confirm Deposit'}
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div className="form-group">
+                <label className="form-label">Tags (comma separated)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Deadlocks, Semaphores, TopperVerified, EndSem"
+                  className="form-input"
+                  value={uploadForm.tags}
+                  onChange={(e) => setUploadForm({ ...uploadForm, tags: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Attach PDF File</label>
+                <input
+                  type="file"
+                  accept=".pdf"
+                  className="form-input"
+                  onChange={(e) => setSelectedFile(e.target.files[0])}
+                  style={{ padding: '0.45rem' }}
+                />
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+                  Accepts PDF files up to 25 MB. If left empty, a verified sample PDF will be linked.
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setUploadModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-accent"
+                  disabled={submitting}
+                >
+                  {submitting ? 'Uploading...' : 'Publish to Vault'}
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
