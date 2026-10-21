@@ -20,7 +20,7 @@
 
 **LitHaven** is a complete, full-stack **MERN** application built for college students to **buy and sell used books** and **share study notes** (cheat sheets, lecture summaries, and solved question papers) with classmates on campus with zero commission fees.
 
-[🚀 Quick Start](#-quick-start) · [📡 API Reference](#-api-reference) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models) · [🎨 Design](#-visual-identity--ux) · [📚 Books Gallery](#-books-gallery)
+[🚀 Quick Start](#-quick-start) · [📡 API Reference](#-api-reference) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models)
 
 ---
 
@@ -69,109 +69,6 @@
 - **Saved Books**: Bookmark books you like with a single click.
 - **Student Profile**: Manage your active listings, saved books, and uploaded notes in one place.
 
-</td>
-</tr>
-</table>
-
----
-
-## 🎨 Visual Identity & UX
-
-LitHaven is crafted with an immersive **Obsidian Atelier** aesthetic:
-- **Dual Theme Support**: *Midnight Atelier* (cosmic obsidian `#06080d`, aurora violet glow, solar amber) and *Travertine Atelier* (warm Italian sandstone, oatmeal, and parchment light mode).
-- **Tactile Hardcover Physics**: Realistic 3D book spine highlights and deep drop-shadow elevations (`-8px translate`) that recreate the sensation of browsing physical library monographs.
-- **Glassmorphic UI**: `backdrop-filter: blur(20px)` panels with fine gold hairlines (`rgba(230, 180, 80, 0.35)`).
-- **Typography**: Curated pairing — **Cinzel** (monumental serif for headers), **Outfit** (modern geometric headings), **Plus Jakarta Sans** (clean body text), and **JetBrains Mono** (for pricing & badges).
-- **Toast Notifications**: Non-intrusive feedback for saves, uploads, inquiries, and profile updates.
-
----
-
-## 📚 Bespoke Monograph Gallery
-
-Each academic volume features original 3D hardcover artwork generated specifically for LitHaven:
-
-<table>
-<tr>
-<td width="25%" align="center">
-<img src="./assets/covers/cover_quantum.jpg" width="100%" style="border-radius: 8px;" alt="Quantum Dynamics" />
-<br/>
-<strong>Quantum Dynamics</strong>
-<br/>
-<sub>Dr. Adrian Vance</sub>
-<br/>
-<small><em>Quantum Physics</em></small>
-</td>
-
-<td width="25%" align="center">
-<img src="./assets/covers/cover_neural.jpg" width="100%" style="border-radius: 8px;" alt="Neural Architectures" />
-<br/>
-<strong>Neural Architectures</strong>
-<br/>
-<sub>Dr. Eleanor Vance</sub>
-<br/>
-<small><em>AI & Deep Learning</em></small>
-</td>
-
-<td width="25%" align="center">
-<img src="./assets/covers/cover_genomic.jpg" width="100%" style="border-radius: 8px;" alt="Genomic Medicine" />
-<br/>
-<strong>Genomic Medicine</strong>
-<br/>
-<sub>Reed & Chen</sub>
-<br/>
-<small><em>Molecular Genetics</em></small>
-</td>
-
-<td width="25%" align="center">
-<img src="./assets/covers/cover_astrophysics.jpg" width="100%" style="border-radius: 8px;" alt="Deep Astrophysics" />
-<br/>
-<strong>Deep Astrophysics</strong>
-<br/>
-<sub>Reed & Elias</sub>
-<br/>
-<small><em>Cosmology</em></small>
-</td>
-</tr>
-
-<tr>
-<td width="25%" align="center">
-<img src="./assets/covers/cover_finance.jpg" width="100%" style="border-radius: 8px;" alt="Quantitative Capital" />
-<br/>
-<strong>Quantitative Capital</strong>
-<br/>
-<sub>Vance & Desai</sub>
-<br/>
-<small><em>Computational Finance</em></small>
-</td>
-
-<td width="25%" align="center">
-<img src="./assets/covers/cover_cybernetics.jpg" width="100%" style="border-radius: 8px;" alt="Cybernetic Systems" />
-<br/>
-<strong>Cybernetic Systems</strong>
-<br/>
-<sub>Advanced Tech Press</sub>
-<br/>
-<small><em>Robotics & Controls</em></small>
-</td>
-
-<td width="25%" align="center">
-<img src="./assets/covers/cover_jurisprudence.jpg" width="100%" style="border-radius: 8px;" alt="Ethical Jurisprudence" />
-<br/>
-<strong>Ethical Jurisprudence</strong>
-<br/>
-<sub>Aaron J. Vance</sub>
-<br/>
-<small><em>Legal Philosophy</em></small>
-</td>
-
-<td width="25%" align="center">
-<img src="./assets/covers/cover_topology.jpg" width="100%" style="border-radius: 8px;" alt="Algebraic Topology" />
-<br/>
-<strong>Algebraic Topology</strong>
-<br/>
-<sub>Hatcher & Stein</sub>
-<br/>
-<small><em>Pure Mathematics</em></small>
 </td>
 </tr>
 </table>
