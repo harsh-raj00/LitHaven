@@ -110,6 +110,30 @@
 
 </details>
 
+<br/>
+
+<details open>
+<summary>💬 <strong>Inquiries, Offers & Direct Campus Chat</strong></summary>
+<br/>
+
+<p align="center">
+  <img src="./assets/screenshots/messages_chat.png" alt="Direct Campus Chat and Offer Negotiation" width="100%" style="border-radius: 8px;" />
+</p>
+
+</details>
+
+<br/>
+
+<details open>
+<summary>⚡ <strong>Sell a Book with Real-Time 3D Card Preview</strong></summary>
+<br/>
+
+<p align="center">
+  <img src="./assets/screenshots/sell_book_preview.png" alt="Book Listing Creation with Live 3D Card Preview" width="100%" style="border-radius: 8px;" />
+</p>
+
+</details>
+
 ---
 
 ## 🏗️ Architecture & Data Models
