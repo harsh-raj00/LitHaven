@@ -10,6 +10,8 @@
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
 [![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io)
 [![Vite](https://img.shields.io/badge/Vite-Fast-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-lit--haven.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://lit-haven.vercel.app)
+[![API Status](https://img.shields.io/badge/API-Online-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://lithaven-tidb.onrender.com/health)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 <br/>
@@ -18,9 +20,11 @@
   <img src="./assets/banner.jpg" alt="LitHaven Hero Banner" width="100%" style="border-radius: 14px; box-shadow: 0 12px 36px rgba(0,0,0,0.6);" />
 </p>
 
+🌐 **Live Website**: [https://lit-haven.vercel.app](https://lit-haven.vercel.app)
+
 **LitHaven** is a complete, full-stack **MERN** application built for college students to **buy and sell used books** and **share study notes** (cheat sheets, lecture summaries, and solved question papers) with classmates on campus with zero commission fees.
 
-[📸 Preview](#-application-preview) · [🚀 Quick Start](#-quick-start) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models) · [🛡️ Verification](#%EF%B8%8F-verification--testing)
+[🌐 Live Demo](https://lit-haven.vercel.app) · [📸 Preview](#-application-preview) · [🚀 Quick Start](#-quick-start) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models) · [🛡️ Verification](#%EF%B8%8F-verification--testing)
 
 ---
 
