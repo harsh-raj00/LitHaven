@@ -77,6 +77,113 @@
 
 ## 🏗️ Architecture & Data Models
 
+### 📐 System Architecture Diagram
+
+```mermaid
+flowchart TD
+    subgraph Client ["Client Layer · Frontend (React 19 + Vite)"]
+        UI["🖥️ Modern Web UI<br/>(Marketplace, Notes, Chat, Profile)"]
+        Context["⚡ Context State<br/>(AuthContext & ToastContext)"]
+        APIClient["📡 Axios API Client<br/>(services/api.js)"]
+        UI --> Context
+        Context --> APIClient
+    end
+
+    subgraph Server ["Server Layer · Backend (Node.js + Express)"]
+        ServerEntry["Express.js Server (:5001)"]
+        MW["Middleware<br/>(CORS, JWT Protect, Error Handler)"]
+        
+        subgraph Routes ["REST API Controllers"]
+            R_Auth["/api/auth<br/>(Auth & Profiles)"]
+            R_Books["/api/books<br/>(Books Exchange & Filters)"]
+            R_Res["/api/resources<br/>(Academic Notes & Papers)"]
+            R_Inq["/api/inquiries<br/>(Offers & Direct Chat)"]
+            R_Rev["/api/reviews<br/>(Seller Ratings)"]
+            R_Stats["/api/stats<br/>(Community Metrics)"]
+        end
+
+        ServerEntry --> MW
+        MW --> Routes
+    end
+
+    subgraph Data ["Data & Storage Layer"]
+        MongoDB[("🍃 MongoDB Database<br/>(Mongoose ODM)")]
+        DiskStorage["📁 Static Media Storage<br/>(/uploads)"]
+    end
+
+    APIClient -->|"HTTP / REST API (JSON)"| ServerEntry
+    Routes -->|"Queries & Mutations"| MongoDB
+    R_Books -.->|"Book Cover Uploads"| DiskStorage
+    R_Res -.->|"Notes & PDF Uploads"| DiskStorage
+```
+
+### 🗄️ Database Entity Relationship (ER) Diagram
+
+```mermaid
+erDiagram
+    USER ||--o{ BOOK : "lists for sale"
+    USER ||--o{ RESOURCE : "uploads notes"
+    USER ||--o{ INQUIRY : "sends / receives offers"
+    USER ||--o{ REVIEW : "writes & receives"
+    BOOK ||--o{ INQUIRY : "is topic of"
+    BOOK ||--o{ REVIEW : "referenced by"
+
+    USER {
+        ObjectId _id PK
+        string name
+        string email
+        string college
+        string role
+        array wishlist
+        number rating
+        number reviewCount
+    }
+
+    BOOK {
+        ObjectId _id PK
+        string title
+        string author
+        string category
+        number price
+        number originalPrice
+        string condition
+        string status
+        ObjectId seller FK
+        string meetingSpot
+    }
+
+    RESOURCE {
+        ObjectId _id PK
+        string title
+        string subject
+        string fileType
+        number downloadCount
+        number likes
+        ObjectId uploader FK
+    }
+
+    INQUIRY {
+        ObjectId _id PK
+        ObjectId book FK
+        ObjectId buyer FK
+        ObjectId seller FK
+        number offerPrice
+        string status
+        array messages
+    }
+
+    REVIEW {
+        ObjectId _id PK
+        ObjectId seller FK
+        ObjectId reviewer FK
+        ObjectId book FK
+        number rating
+        string comment
+    }
+```
+
+### 📁 Project Directory Structure
+
 ```
 LitHaven/
 ├── backend/
@@ -199,23 +306,22 @@ Now open **[http://localhost:5174](http://localhost:5174)** in your browser!
 
 ---
 
-## 🌿 Git Branches & Reversible Architecture
+## 🌿 Git Branches
 
-LitHaven features a strict Git branch architecture for zero-risk testing and evaluation:
+LitHaven maintains synchronized branches for production and features:
 
 ```bash
-# To view all branches
-git branch
-
-# Currently on the Redesigned Human-Crafted Editorial Experience:
-git checkout redesign/pro-uiux
-
-# To return to the Original Baseline State:
+# Main production codebase
 git checkout main
+
+# Pro UI/UX feature branch
+git checkout redesign/pro-uiux
 ```
 
-- **`main`**: The clean original backup state of LitHaven before the UI/UX redesign.
-- **`redesign/pro-uiux`**: The completely redesigned production application with editorial typography, tactile 3D spine lighting, multi-view exchange (Grid, Ledger, Bookshelf), and collegiate academic aesthetics.
+- **`main`**: The primary full-stack production codebase with complete frontend, backend, MongoDB Atlas setup, and seed data.
+- **`redesign/pro-uiux`**: Feature and development branch for UI/UX iterations and design refinements.
+
+---
 
 ## 📡 API Reference
 
@@ -241,13 +347,14 @@ git checkout main
 | `DELETE` | `/api/books/:id` | Remove a listing (owner only) | 🔒 Yes |
 | `POST` | `/api/books/:id/wishlist` | Toggle book in user's wishlist | 🔒 Yes |
 
-### 📝 The Scriptorium (`/api/resources`)
+### 📝 Study Notes & Resources (`/api/resources`)
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|:---:|
 | `GET` | `/api/resources` | Browse study materials (filter by file type/subject) | No |
 | `GET` | `/api/resources/my-resources` | Get current user's uploaded resources | 🔒 Yes |
 | `GET` | `/api/resources/:id` | Get resource details | No |
 | `POST` | `/api/resources/:id/download` | Register download and increment counter | No |
+| `POST` | `/api/resources/:id/like` | Upvote/like a helpful study resource | No |
 | `POST` | `/api/resources` | Upload notes/cheat sheet (multipart or link) | 🔒 Yes |
 | `DELETE` | `/api/resources/:id` | Remove a resource (uploader only) | 🔒 Yes |
 
@@ -259,6 +366,12 @@ git checkout main
 | `GET` | `/api/inquiries/:id` | Get specific chat thread & messages | 🔒 Yes |
 | `POST` | `/api/inquiries/:id/messages` | Send message in inquiry thread | 🔒 Yes |
 | `PUT` | `/api/inquiries/:id/status` | Update status (`accepted`, `declined`, `completed`) | 🔒 Yes |
+
+### ⭐ Seller Ratings & Reviews (`/api/reviews`)
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|:---:|
+| `POST` | `/api/reviews` | Submit seller rating and review after purchase | 🔒 Yes |
+| `GET` | `/api/reviews/seller/:sellerId` | Get all student reviews and rating for a seller | No |
 
 ### 📊 Platform Analytics (`/api/stats`)
 | Method | Endpoint | Description | Auth Required |
