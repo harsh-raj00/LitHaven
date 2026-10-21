@@ -21,9 +21,6 @@ export const Navbar = ({ currentView, setCurrentView }) => {
     try {
       const stored = localStorage.getItem('lithaven_theme');
       if (stored === 'dark' || stored === 'light') return stored;
-      if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
-      }
     } catch (e) {}
     return 'light';
   });

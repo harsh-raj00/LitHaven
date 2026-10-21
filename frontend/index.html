@@ -6,11 +6,11 @@
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238b5cf6'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LitHaven | The Obsidian Atelier & Academic Book Sanctuary</title>
+  <title>LitHaven | College Book Exchange & Study Notes</title>
   <meta name="description"
-    content="LitHaven is an avant-garde campus literary sanctuary and peer-to-peer textbook exchange built for university scholars and researchers." />
+    content="LitHaven is a full-stack campus platform for university students to buy, sell, and exchange used textbooks and share academic study notes." />
   <meta name="keywords"
-    content="academic books, research monographs, peer-to-peer book exchange, study vault, university manuscripts, MERN stack" />
+    content="academic books, college textbooks, peer-to-peer book exchange, study vault, university notes, solved papers, MERN stack" />
 
   <!-- Google Fonts: Cormorant Garamond (Literary Serif), Fraunces (Editorial Display), Cinzel (Monumental Serif), Outfit (Modern Display), Plus Jakarta Sans (Clean Body), JetBrains Mono (Specs) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,12 +18,12 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
     rel="stylesheet">
-  <!-- Early theme initialization to eliminate white flash on reload -->
+  <!-- Early theme initialization: defaults to warm cream light mode -->
   <script>
     (function () {
       try {
         var stored = localStorage.getItem('lithaven_theme');
-        var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        var theme = (stored === 'dark' || stored === 'light') ? stored : 'light';
         document.documentElement.setAttribute('data-theme', theme);
       } catch (e) { }
     })();
