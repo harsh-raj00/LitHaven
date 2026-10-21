@@ -20,7 +20,7 @@
 
 **LitHaven** is a complete, full-stack **MERN** application built for college students to **buy and sell used books** and **share study notes** (cheat sheets, lecture summaries, and solved question papers) with classmates on campus with zero commission fees.
 
-[🚀 Quick Start](#-quick-start) · [📡 API Reference](#-api-reference) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models)
+[🚀 Quick Start](#-quick-start) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models) · [🛡️ Verification](#%EF%B8%8F-verification--testing)
 
 ---
 
@@ -65,7 +65,6 @@
 
 ### 🔐 Accounts & Profiles
 - **Secure Logins**: Fast and safe token-based sign-in.
-- **1-Click Demo Accounts**: Test immediately with Engineering, Medical, or Business student accounts.
 - **Saved Books**: Bookmark books you like with a single click.
 - **Student Profile**: Manage your active listings, saved books, and uploaded notes in one place.
 
@@ -268,19 +267,7 @@ cd backend
 npm run seed
 ```
 
-<details>
-<summary>🔑 <strong>Demo Accounts Included</strong></summary>
 
-| Student | Email | Password | Academic Discipline | University |
-|---|---|---|---|---|
-| **Aanya Sharma** | `aanya@lithaven.edu` | `password123` | Computer Science & AI | IIT Delhi |
-| **Dr. Marcus Vance** | `marcus@lithaven.edu` | `password123` | Medicine & Surgery | AIIMS New Delhi |
-| **Sophia Chen** | `sophia@lithaven.edu` | `password123` | Commerce & Finance | SRCC / Delhi Univ |
-| **Rohan Deshmukh** | `rohan@lithaven.edu` | `password123` | Electrical & Math | BITS Pilani |
-
-*Tip: The web UI features instant 1-click login buttons for all demo personas!*
-
-</details>
 
 ---
 
@@ -321,62 +308,7 @@ git checkout redesign/pro-uiux
 - **`main`**: The primary full-stack production codebase with complete frontend, backend, MongoDB Atlas setup, and seed data.
 - **`redesign/pro-uiux`**: Feature and development branch for UI/UX iterations and design refinements.
 
----
 
-## 📡 API Reference
-
-### 🔐 Authentication (`/api/auth`)
-| Method | Endpoint | Description | Auth Required |
-|---|---|---|:---:|
-| `POST` | `/api/auth/register` | Register a new student account | No |
-| `POST` | `/api/auth/login` | Authenticate and retrieve JWT token | No |
-| `GET` | `/api/auth/me` | Fetch authenticated user profile and wishlist | 🔒 Yes |
-| `PUT` | `/api/auth/profile` | Update profile (college, department, bio) | 🔒 Yes |
-| `GET` | `/api/auth/user/:id` | View any student's public profile & listings | No |
-
-### 📖 Books Marketplace (`/api/books`)
-| Method | Endpoint | Description | Auth Required |
-|---|---|---|:---:|
-| `GET` | `/api/books` | Browse books with search, filters, and pagination | No |
-| `GET` | `/api/books/featured` | Get top-viewed and trending textbooks | No |
-| `GET` | `/api/books/categories` | Get category breakdown with counts | No |
-| `GET` | `/api/books/my-listings` | Fetch current user's listings | 🔒 Yes |
-| `GET` | `/api/books/:id` | Get book details & increment views | No |
-| `POST` | `/api/books` | Create a new book listing (supports image upload) | 🔒 Yes |
-| `PUT` | `/api/books/:id` | Update a listing (owner only) | 🔒 Yes |
-| `DELETE` | `/api/books/:id` | Remove a listing (owner only) | 🔒 Yes |
-| `POST` | `/api/books/:id/wishlist` | Toggle book in user's wishlist | 🔒 Yes |
-
-### 📝 Study Notes & Resources (`/api/resources`)
-| Method | Endpoint | Description | Auth Required |
-|---|---|---|:---:|
-| `GET` | `/api/resources` | Browse study materials (filter by file type/subject) | No |
-| `GET` | `/api/resources/my-resources` | Get current user's uploaded resources | 🔒 Yes |
-| `GET` | `/api/resources/:id` | Get resource details | No |
-| `POST` | `/api/resources/:id/download` | Register download and increment counter | No |
-| `POST` | `/api/resources/:id/like` | Upvote/like a helpful study resource | No |
-| `POST` | `/api/resources` | Upload notes/cheat sheet (multipart or link) | 🔒 Yes |
-| `DELETE` | `/api/resources/:id` | Remove a resource (uploader only) | 🔒 Yes |
-
-### 💬 Inquiries & Offers (`/api/inquiries`)
-| Method | Endpoint | Description | Auth Required |
-|---|---|---|:---:|
-| `POST` | `/api/inquiries` | Send an offer & start a handover chat | 🔒 Yes |
-| `GET` | `/api/inquiries/my-inquiries` | Get all active conversation threads | 🔒 Yes |
-| `GET` | `/api/inquiries/:id` | Get specific chat thread & messages | 🔒 Yes |
-| `POST` | `/api/inquiries/:id/messages` | Send message in inquiry thread | 🔒 Yes |
-| `PUT` | `/api/inquiries/:id/status` | Update status (`accepted`, `declined`, `completed`) | 🔒 Yes |
-
-### ⭐ Seller Ratings & Reviews (`/api/reviews`)
-| Method | Endpoint | Description | Auth Required |
-|---|---|---|:---:|
-| `POST` | `/api/reviews` | Submit seller rating and review after purchase | 🔒 Yes |
-| `GET` | `/api/reviews/seller/:sellerId` | Get all student reviews and rating for a seller | No |
-
-### 📊 Platform Analytics (`/api/stats`)
-| Method | Endpoint | Description | Auth Required |
-|---|---|---|:---:|
-| `GET` | `/api/stats` | Community metrics (active books, savings, campuses) | No |
 
 ---
 

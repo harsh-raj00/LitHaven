@@ -19,3 +19,6 @@ backend/.env.local
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Local Documentation (Private)
+API.md
