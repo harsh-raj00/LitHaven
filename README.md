@@ -89,24 +89,36 @@
 <br/>
 
 <details open>
-<summary>📚 <strong>Campus Marketplace & 3D Books Catalog</strong></summary>
+<summary>📚 <strong>Campus Catalog & Interactive Bookshelf</strong></summary>
 <br/>
 
-| Featured Campus Volumes | Filterable Books Marketplace |
+| Featured Volumes Catalog | Interactive Library Bookshelf Spines |
 |:---:|:---:|
-| <img src="./assets/screenshots/featured_books.png" alt="Featured Volumes" width="100%" style="border-radius: 8px;" /> | <img src="./assets/screenshots/marketplace.png" alt="Search and Filters" width="100%" style="border-radius: 8px;" /> |
+| <img src="./assets/screenshots/featured_books.png" alt="Featured Volumes" width="100%" style="border-radius: 8px;" /> | <img src="./assets/screenshots/interactive_bookshelf.png" alt="Interactive Bookshelf Spines" width="100%" style="border-radius: 8px;" /> |
 
 </details>
 
 <br/>
 
 <details open>
-<summary>📝 <strong>Study Vault & Academic Notes</strong></summary>
+<summary>🔍 <strong>Search Marketplace & Live Listing Creation</strong></summary>
 <br/>
 
-<p align="center">
-  <img src="./assets/screenshots/study_vault.png" alt="Academic Resources and Notes" width="100%" style="border-radius: 8px;" />
-</p>
+| Filterable Books Marketplace | Live 3D Card Listing Preview |
+|:---:|:---:|
+| <img src="./assets/screenshots/marketplace.png" alt="Search and Filters" width="100%" style="border-radius: 8px;" /> | <img src="./assets/screenshots/sell_book_preview.png" alt="Live 3D Listing Preview" width="100%" style="border-radius: 8px;" /> |
+
+</details>
+
+<br/>
+
+<details open>
+<summary>📝 <strong>Study Vault & Student Profile Dashboard</strong></summary>
+<br/>
+
+| Study Vault & Academic Resources | Student Profile & Active Listings |
+|:---:|:---:|
+| <img src="./assets/screenshots/study_vault.png" alt="Academic Resources and Notes" width="100%" style="border-radius: 8px;" /> | <img src="./assets/screenshots/student_dashboard.png" alt="Student Profile Dashboard" width="100%" style="border-radius: 8px;" /> |
 
 </details>
 
@@ -118,18 +130,6 @@
 
 <p align="center">
   <img src="./assets/screenshots/messages_chat.png" alt="Direct Campus Chat and Offer Negotiation" width="100%" style="border-radius: 8px;" />
-</p>
-
-</details>
-
-<br/>
-
-<details open>
-<summary>⚡ <strong>Sell a Book with Real-Time 3D Card Preview</strong></summary>
-<br/>
-
-<p align="center">
-  <img src="./assets/screenshots/sell_book_preview.png" alt="Book Listing Creation with Live 3D Card Preview" width="100%" style="border-radius: 8px;" />
 </p>
 
 </details>
