@@ -206,7 +206,7 @@ router.get('/', async (req, res, next) => {
 // @access  Public
 router.get('/featured', async (req, res, next) => {
   try {
-    const limit = parseInt(req.query.limit, 6) || 8;
+    const limit = parseInt(req.query.limit, 10) || 8;
     const featured = await Book.find({ status: 'available' })
       .sort({ featured: -1, views: -1, wishlistCount: -1, createdAt: -1 })
       .limit(limit)

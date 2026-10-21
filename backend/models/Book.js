@@ -56,6 +56,7 @@ const bookSchema = new mongoose.Schema(
         'Commerce, Finance & MBA',
         'Law & Legal Studies',
         'Humanities & Social Sciences',
+        'Interview Preparation & Coding',
         'Competitive Exams',
         'Literature & Fiction',
         'Other'
