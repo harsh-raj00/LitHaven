@@ -20,7 +20,7 @@
 
 **LitHaven** is a complete, full-stack **MERN** application built for college students to **buy and sell used books** and **share study notes** (cheat sheets, lecture summaries, and solved question papers) with classmates on campus with zero commission fees.
 
-[🚀 Quick Start](#-quick-start) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models) · [🛡️ Verification](#%EF%B8%8F-verification--testing)
+[📸 Preview](#-application-preview) · [🚀 Quick Start](#-quick-start) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models) · [🛡️ Verification](#%EF%B8%8F-verification--testing)
 
 ---
 
@@ -71,6 +71,44 @@
 </td>
 </tr>
 </table>
+
+---
+
+## 📸 Application Preview
+
+<details open>
+<summary>🌗 <strong>Dual Theme Experience (Dark & Light Mode)</strong></summary>
+<br/>
+
+| Midnight Atelier (Dark Mode) | Travertine Atelier (Light Mode) |
+|:---:|:---:|
+| <img src="./assets/screenshots/hero_dark.png" alt="LitHaven Dark Mode" width="100%" style="border-radius: 8px;" /> | <img src="./assets/screenshots/hero_light.png" alt="LitHaven Light Mode" width="100%" style="border-radius: 8px;" /> |
+
+</details>
+
+<br/>
+
+<details open>
+<summary>📚 <strong>Campus Marketplace & 3D Books Catalog</strong></summary>
+<br/>
+
+| Featured Campus Volumes | Filterable Books Marketplace |
+|:---:|:---:|
+| <img src="./assets/screenshots/featured_books.png" alt="Featured Volumes" width="100%" style="border-radius: 8px;" /> | <img src="./assets/screenshots/marketplace.png" alt="Search and Filters" width="100%" style="border-radius: 8px;" /> |
+
+</details>
+
+<br/>
+
+<details open>
+<summary>📝 <strong>Study Vault & Academic Notes</strong></summary>
+<br/>
+
+<p align="center">
+  <img src="./assets/screenshots/study_vault.png" alt="Academic Resources and Notes" width="100%" style="border-radius: 8px;" />
+</p>
+
+</details>
 
 ---
 
