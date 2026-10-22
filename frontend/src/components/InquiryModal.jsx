@@ -58,26 +58,25 @@ export const InquiryModal = ({ book, onClose, onSuccess }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="modal-content"
-        style={{ maxWidth: '540px', padding: '2rem' }}
+        className="modal-content inquiry-modal-content"
         onClick={(e) => e.stopPropagation()}
       >
         <button className="modal-close-btn" onClick={onClose} aria-label="Close">
           <X size={18} />
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', marginBottom: '1.6rem' }}>
+        <div className="inquiry-modal-header-strip">
           <img
             src={book.coverImage || '/covers/cover_placeholder.jpg'}
             alt={book.title}
-            style={{ width: '60px', height: '80px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-subtle)' }}
+            className="inquiry-modal-thumb"
           />
-          <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--accent-terracotta)', fontWeight: 800, letterSpacing: '0.06em' }}>
+          <div className="inquiry-modal-book-info">
+            <div className="inquiry-modal-eyebrow">
               PROPOSE HANDOVER OFFER
             </div>
-            <h3 className="font-serif-literary" style={{ fontSize: '1.3rem', lineHeight: 1.25 }}>{book.title}</h3>
-            <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)' }}>
+            <h3 className="font-serif-literary inquiry-modal-book-title">{book.title}</h3>
+            <div className="inquiry-modal-book-meta">
               Listed at: <strong className="font-mono" style={{ color: 'var(--text-primary)' }}>{formatINR(book.price)}</strong> by{' '}
               {book.owner?.name}
             </div>

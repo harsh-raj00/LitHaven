@@ -27,6 +27,7 @@ export const InquiriesPage = () => {
 
   // Ref to track the user's active selected conversation across intervals and async fetches
   const selectedInquiryIdRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
   // Keep selectedInquiryIdRef in sync with state
   useEffect(() => {
@@ -34,6 +35,38 @@ export const InquiriesPage = () => {
       selectedInquiryIdRef.current = selectedInquiry._id;
     }
   }, [selectedInquiry?._id]);
+
+  // Sync body class when mobile chat is open so bottom dock doesn't obscure chat input
+  useEffect(() => {
+    if (showChatMobile) {
+      document.body.classList.add('chat-view-active');
+    } else {
+      document.body.classList.remove('chat-view-active');
+    }
+    return () => {
+      document.body.classList.remove('chat-view-active');
+    };
+  }, [showChatMobile]);
+
+  // Handle desktop resize so mobile state resets cleanly
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 900) {
+        document.body.classList.remove('chat-view-active');
+      } else if (showChatMobile) {
+        document.body.classList.add('chat-view-active');
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [showChatMobile]);
+
+  // Auto-scroll messages feed to bottom on new message or conversation switch
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [selectedInquiry?.messages?.length, showChatMobile]);
 
   // Deterministic stable sorting by lastMessageAt descending with ID fallback
   const sortInquiries = (list) => {
@@ -163,16 +196,16 @@ export const InquiriesPage = () => {
   };
 
   return (
-    <div style={{ padding: '2rem 0 4rem' }}>
+    <div className={`inquiries-page-wrap ${showChatMobile ? 'chat-open-mobile' : ''}`}>
       <div className="content-wrapper">
-        <div style={{ marginBottom: '1.75rem' }}>
-          <div style={{ fontSize: '0.74rem', color: 'var(--accent-terracotta)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'var(--font-mono)', marginBottom: '0.35rem' }}>
+        <div className={`inquiries-page-header ${showChatMobile ? 'mobile-hidden-header' : ''}`}>
+          <div className="eyebrow-tag" style={{ marginBottom: '0.35rem' }}>
             CAMPUS DISPATCH
           </div>
-          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.2rem', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '0.35rem' }}>
+          <h1 className="inquiries-page-title">
             Messages & Handover Offers
           </h1>
-          <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)' }}>
+          <p className="inquiries-page-subtitle">
             Coordinate in-person campus exchanges, confirm offer prices, and lock in meeting spots.
           </p>
         </div>
@@ -223,52 +256,35 @@ export const InquiriesPage = () => {
                       onClick={() => handleSelectInquiry(inq)}
                       className={`inquiry-thread-item ${isSelected ? 'selected' : ''}`}
                     >
-                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                      <div className="inquiry-thread-layout">
                         <img
                           src={inq.book?.coverImage || '/covers/cover_placeholder.jpg'}
                           alt={inq.book?.title}
-                          style={{
-                            width: '44px',
-                            height: '58px',
-                            borderRadius: 'var(--radius-sm)',
-                            objectFit: 'cover',
-                            border: '1px solid var(--border-subtle)',
-                            flexShrink: 0
-                          }}
+                          className="inquiry-thread-thumb"
                         />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.2rem' }}>
-                            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                        <div className="inquiry-thread-content">
+                          <div className="inquiry-thread-top">
+                            <span className="inquiry-thread-party">
                               {sellerMode ? 'Offer from' : 'Seller'}: <strong>{otherParty?.name?.split(' ')[0]}</strong>
                             </span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                            <div className="inquiry-thread-meta">
+                              <span className="inquiry-thread-time font-mono">
                                 {lastTime}
                               </span>
                               {getStatusBadge(inq.status)}
                             </div>
                           </div>
 
-                          <div
-                            style={{
-                              fontSize: '0.88rem',
-                              fontWeight: 600,
-                              color: 'var(--text-primary)',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              marginBottom: '0.2rem'
-                            }}
-                          >
+                          <div className="inquiry-thread-title">
                             {inq.book?.title}
                           </div>
 
-                          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', fontSize: '0.8rem' }}>
-                            <span className="font-mono" style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+                          <div className="inquiry-thread-pricing">
+                            <span className="font-mono inquiry-offer-amt">
                               Offer: {formatINR(inq.offeredPrice)}
                             </span>
                             {inq.book?.price && (
-                              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                              <span className="inquiry-listed-amt">
                                 (Listed: {formatINR(inq.book.price)})
                               </span>
                             )}
@@ -284,86 +300,70 @@ export const InquiriesPage = () => {
             {/* Right Column: Chat Window & Offer Controls */}
             <div className={`inquiries-chat-col ${!showChatMobile ? 'mobile-hidden' : ''}`}>
               {selectedInquiry ? (
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  {/* Mobile Back Bar */}
-                  <div className="mobile-chat-nav-bar">
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => setShowChatMobile(false)}
-                      style={{ padding: '0.4rem 0.6rem', gap: '0.4rem', fontSize: '0.85rem' }}
-                    >
-                      <ArrowLeft size={16} /> All Conversations
-                    </button>
-                    {getStatusBadge(selectedInquiry.status)}
-                  </div>
-
-                  {/* Header */}
+                <div className="inquiries-chat-inner">
+                  {/* Unified Compact Chat Header */}
                   <div className="inquiry-chat-header">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flex: 1, minWidth: 0 }}>
+                    <div className="inquiry-header-left">
+                      <button
+                        type="button"
+                        className="chat-back-btn"
+                        onClick={() => setShowChatMobile(false)}
+                        aria-label="Back to all conversations"
+                      >
+                        <ArrowLeft size={18} />
+                      </button>
                       <img
                         src={selectedInquiry.book?.coverImage || '/covers/cover_placeholder.jpg'}
                         alt={selectedInquiry.book?.title}
-                        style={{ width: '42px', height: '54px', borderRadius: 'var(--radius-sm)', objectFit: 'cover', flexShrink: 0 }}
+                        className="chat-header-book-img"
                       />
-                      <div style={{ minWidth: 0 }}>
-                        <div
-                          style={{
-                            fontSize: '0.94rem',
-                            fontWeight: 600,
-                            color: 'var(--text-primary)',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                          }}
-                        >
+                      <div className="chat-header-meta">
+                        <div className="chat-header-book-title" title={selectedInquiry.book?.title}>
                           {selectedInquiry.book?.title}
                         </div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                          Offer: <strong className="font-mono" style={{ color: 'var(--text-primary)' }}>{formatINR(selectedInquiry.offeredPrice)}</strong>
-                          <span className="hide-on-mobile"> • Meet at {selectedInquiry.proposedLocation}</span>
+                        <div className="chat-header-sub">
+                          <span>Offer: <strong className="font-mono">{formatINR(selectedInquiry.offeredPrice)}</strong></span>
+                          <span className="chat-header-spot">• {selectedInquiry.proposedLocation}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Seller Action Controls */}
-                    {isSeller(selectedInquiry) && (
-                      <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0 }}>
-                        {selectedInquiry.status === 'pending' && (
-                          <>
-                            <button
-                              className="btn btn-primary btn-sm"
-                              onClick={() => handleStatusChange('accepted')}
-                            >
-                              Accept Offer
-                            </button>
-                            <button
-                              className="btn btn-secondary btn-sm"
-                              onClick={() => handleStatusChange('declined')}
-                            >
-                              Decline
-                            </button>
-                          </>
-                        )}
-                        {selectedInquiry.status === 'accepted' && (
+                    <div className="inquiry-header-right">
+                      {getStatusBadge(selectedInquiry.status)}
+                      {isSeller(selectedInquiry) && selectedInquiry.status === 'pending' && (
+                        <div className="chat-header-seller-actions">
                           <button
-                            className="btn btn-primary btn-sm"
-                            onClick={() => handleStatusChange('completed')}
+                            className="btn btn-primary btn-sm chat-action-btn"
+                            onClick={() => handleStatusChange('accepted')}
                           >
-                            Mark Completed
+                            Accept
                           </button>
-                        )}
-                      </div>
-                    )}
+                          <button
+                            className="btn btn-secondary btn-sm chat-action-btn"
+                            onClick={() => handleStatusChange('declined')}
+                          >
+                            Decline
+                          </button>
+                        </div>
+                      )}
+                      {isSeller(selectedInquiry) && selectedInquiry.status === 'accepted' && (
+                        <button
+                          className="btn btn-primary btn-sm chat-action-btn"
+                          onClick={() => handleStatusChange('completed')}
+                        >
+                          Mark Completed
+                        </button>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Location notice on mobile */}
-                  <div className="show-on-mobile" style={{ padding: '0.5rem 1rem', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    <MapPin size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
-                    Meeting spot: <strong style={{ color: 'var(--text-secondary)' }}>{selectedInquiry.proposedLocation}</strong>
+                  {/* Location strip on small mobile */}
+                  <div className="chat-location-strip-mobile">
+                    <MapPin size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
+                    Meetup Quad: <strong>{selectedInquiry.proposedLocation}</strong>
                   </div>
 
-                  {/* Messages Thread */}
+                  {/* Messages Feed */}
                   <div className="inquiry-messages-scroll">
                     {selectedInquiry.messages?.map((msg, idx) => {
                       const senderId = typeof msg.sender === 'string' ? msg.sender : msg.sender?._id;
@@ -373,34 +373,18 @@ export const InquiriesPage = () => {
                       return (
                         <div
                           key={idx}
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: isMe ? 'flex-end' : 'flex-start'
-                          }}
+                          className={`inquiry-msg-row ${isMe ? 'msg-outgoing' : 'msg-incoming'}`}
                         >
-                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
+                          <div className="inquiry-msg-sender">
                             {senderName} • {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
-                          <div
-                            style={{
-                              maxWidth: '85%',
-                              padding: '0.65rem 0.95rem',
-                              borderRadius: 'var(--radius-md)',
-                              fontSize: '0.88rem',
-                              lineHeight: 1.5,
-                              wordBreak: 'break-word',
-                              overflowWrap: 'anywhere',
-                              background: isMe ? 'var(--btn-primary-bg)' : 'var(--bg-secondary)',
-                              color: isMe ? 'var(--btn-primary-text)' : 'var(--text-primary)',
-                              border: isMe ? 'none' : '1px solid var(--border-subtle)'
-                            }}
-                          >
+                          <div className={`inquiry-msg-bubble ${isMe ? 'bubble-outgoing' : 'bubble-incoming'}`}>
                             {msg.text}
                           </div>
                         </div>
                       );
                     })}
+                    <div ref={messagesEndRef} />
                   </div>
 
                   {/* Input Area */}
@@ -410,30 +394,30 @@ export const InquiriesPage = () => {
                         e.preventDefault();
                         handleSendMessage();
                       }}
-                      style={{ display: 'flex', gap: '0.5rem' }}
+                      className="inquiry-input-form"
                     >
                       <input
                         type="text"
-                        className="form-input"
+                        className="form-input inquiry-input-field"
                         placeholder="Type a message (e.g. Can meet in 15 mins)..."
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
-                        style={{ fontSize: '0.88rem' }}
                       />
                       <button
                         type="submit"
-                        className="btn btn-accent"
+                        className="btn btn-accent inquiry-send-btn"
                         disabled={sending || !messageText.trim()}
-                        style={{ padding: '0.65rem 1.15rem', whiteSpace: 'nowrap' }}
+                        aria-label="Send message"
                       >
-                        <Send size={15} /> <span className="hide-on-mobile">Send</span>
+                        <Send size={16} /> <span className="send-text-label">Send</span>
                       </button>
                     </form>
                   </div>
                 </div>
               ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', padding: '3rem', height: '100%' }}>
-                  Select a message on the left to start chatting
+                <div className="inquiries-empty-prompt">
+                  <MessageSquare size={32} style={{ marginBottom: '0.5rem', opacity: 0.5 }} />
+                  <div>Select a conversation from the left to start chatting</div>
                 </div>
               )}
             </div>
