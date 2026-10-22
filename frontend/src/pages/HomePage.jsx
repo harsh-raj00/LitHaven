@@ -272,6 +272,7 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
               {/* Category Filter Pills (Compact & Refined) */}
               <div
+                className="catalog-tabs-container"
                 style={{
                   display: 'flex',
                   background: 'var(--bg-secondary)',
@@ -279,7 +280,10 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
                   borderRadius: 'var(--radius-sm)',
                   padding: '2px',
                   gap: '2px',
-                  overflowX: 'auto'
+                  overflowX: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  maxWidth: '100%',
+                  scrollbarWidth: 'none'
                 }}
               >
                 {[
@@ -393,7 +397,7 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))',
                 gap: '1.75rem'
               }}
             >
@@ -585,7 +589,7 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
               gap: '1.25rem'
             }}
           >
@@ -615,7 +619,7 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
                 Search Course Stacks
               </h3>
               <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                Filter by semester, course code, or professor's syllabus. Sellers can list textbooks in under 90 seconds with zero listing fees.
+                Filter by semester, course code, or professor's syllabus. Sellers can list textbooks in under 90 seconds .
               </p>
             </div>
 

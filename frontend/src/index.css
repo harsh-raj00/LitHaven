@@ -1428,6 +1428,17 @@ input[type="text"]::-webkit-list-button {
   font-weight: 600;
 }
 
+.catalog-tabs-container,
+.marketplace-quick-chips-row {
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.catalog-tabs-container::-webkit-scrollbar,
+.marketplace-quick-chips-row::-webkit-scrollbar {
+  display: none !important;
+}
+
 /* View Mode Buttons */
 .view-btn {
   display: inline-flex;
@@ -1619,6 +1630,20 @@ input[type="text"]::-webkit-list-button {
   pointer-events: none;
 }
 
+@media (max-width: 900px) {
+  .toast-container {
+    bottom: calc(78px + env(safe-area-inset-bottom, 12px)) !important;
+    right: 1rem !important;
+    left: 1rem !important;
+    align-items: center !important;
+  }
+
+  .toast {
+    width: 100% !important;
+    max-width: 420px !important;
+  }
+}
+
 .toast {
   padding: 0.85rem 1.25rem;
   border-radius: var(--radius-sm);
@@ -1713,7 +1738,7 @@ input[type="text"]::-webkit-list-button {
   top: var(--nav-height);
   left: 0;
   right: 0;
-  max-height: calc(100vh - var(--nav-height) - 76px);
+  max-height: calc(100dvh - var(--nav-height) - 76px);
   overflow-y: auto;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
@@ -2012,11 +2037,18 @@ input[type="text"]::-webkit-list-button {
 
   .book-detail-layout {
     grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
   }
 
   .create-book-layout {
     grid-template-columns: 1fr !important;
     gap: 1.5rem !important;
+  }
+
+  .create-preview-wrap {
+    max-width: 340px;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .stats-grid {
@@ -2114,7 +2146,7 @@ input[type="text"]::-webkit-list-button {
 
 .vault-page-title {
   font-family: var(--font-heading);
-  font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+  font-size: clamp(1.75rem, 5vw, 3.2rem);
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.15;
@@ -2136,6 +2168,20 @@ input[type="text"]::-webkit-list-button {
   gap: 0.55rem;
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .vault-pills-row {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 4px !important;
+    scrollbar-width: none !important;
+  }
+
+  .vault-pills-row::-webkit-scrollbar {
+    display: none !important;
+  }
 }
 
 .vault-pill {
@@ -4394,7 +4440,31 @@ input[type="text"]::-webkit-list-button {
   }
 }
 
+@media (max-width: 640px) {
+  .dashboard-profile-card {
+    padding: 1.25rem 1rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .dashboard-profile-inner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1.25rem !important;
+  }
+
+  .dashboard-stats-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+}
+
 @media (max-width: 480px) {
+  .dashboard-profile-left {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
   .dashboard-tabs {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
@@ -4496,6 +4566,11 @@ input[type="text"]::-webkit-list-button {
 
 /* 9. Mobile Bottom Dock Ultra-Compact Screens & Safe Area */
 @media (max-width: 380px) {
+  .book-detail-cover-box {
+    height: 220px !important;
+    max-width: 175px !important;
+  }
+
   .mobile-bottom-dock {
     left: 0.4rem !important;
     right: 0.4rem !important;
@@ -4725,6 +4800,24 @@ input[type="text"]::-webkit-list-button {
 
   .simple-footer-nav {
     gap: 1.25rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .simple-footer-bottom {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .simple-footer-bottom-left {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.35rem !important;
+  }
+
+  .footer-dot-sep {
+    display: none !important;
   }
 }
 

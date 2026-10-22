@@ -350,7 +350,7 @@ export const Navbar = ({ currentView, setCurrentView }) => {
                   Welcome to LitHaven
                 </div>
                 <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-                  Peer-to-peer textbook marketplace with zero platform fees.
+                  Peer-to-peer textbook marketplace  .
                 </div>
                 <button
                   className="btn btn-primary btn-sm"

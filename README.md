@@ -22,7 +22,7 @@
 
 🌐 **Live Website**: [https://lit-haven.vercel.app](https://lit-haven.vercel.app)
 
-**LitHaven** is a complete, full-stack **MERN** application built for college students to **buy and sell used books** and **share study notes** (cheat sheets, lecture summaries, and solved question papers) with classmates on campus with zero commission fees.
+**LitHaven** is a complete, full-stack **MERN** application built for college students to **buy and sell used books** and **share study notes** (cheat sheets, lecture summaries, and solved question papers) with classmates on campus .
 
 [🌐 Live Demo](https://lit-haven.vercel.app) · [📸 Preview](#-application-preview) · [🚀 Quick Start](#-quick-start) · [🏗️ Architecture & Models](#%EF%B8%8F-architecture--data-models) · [🛡️ Verification](#%EF%B8%8F-verification--testing)
 

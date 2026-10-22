@@ -97,7 +97,7 @@ export const AuthPage = ({ initialTab = 'login', setCurrentView }) => {
             </h1>
 
             <p className="auth-showcase-subtitle">
-              LitHaven connects university scholars to buy, sell, and share essential textbooks and study notes with zero platform commissions.
+              LitHaven connects university scholars to buy, sell, and share essential textbooks and study notes .
             </p>
 
             {/* Value Pillars */}

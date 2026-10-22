@@ -144,11 +144,11 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
           <span className="eyebrow-tag" style={{ marginBottom: '0.4rem' }}>
             CAMPUS DISPATCH // LISTING STUDIO
           </span>
-          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.2rem', fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.75rem, 4vw, 2.2rem)', fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>
             Sell a Book
           </h1>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-            List your course volumes for direct campus handover with zero platform fees
+            List your course volumes for direct campus handover .
           </p>
         </div>
 

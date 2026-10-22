@@ -108,6 +108,7 @@ export const DashboardPage = ({ setCurrentView, onSelectBook, onInquireBook }) =
       <div className="content-wrapper">
         {/* Profile Card */}
         <div
+          className="dashboard-profile-card"
           style={{
             background: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
@@ -117,6 +118,7 @@ export const DashboardPage = ({ setCurrentView, onSelectBook, onInquireBook }) =
           }}
         >
           <div
+            className="dashboard-profile-inner"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -125,7 +127,7 @@ export const DashboardPage = ({ setCurrentView, onSelectBook, onInquireBook }) =
               gap: '1.5rem'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+            <div className="dashboard-profile-left" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
               <img
                 src={
                   user?.avatar ||
@@ -163,7 +165,7 @@ export const DashboardPage = ({ setCurrentView, onSelectBook, onInquireBook }) =
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div className="dashboard-stats-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <div
                 style={{
                   padding: '0.6rem 1rem',
@@ -193,12 +195,15 @@ export const DashboardPage = ({ setCurrentView, onSelectBook, onInquireBook }) =
 
         {/* Navigation Tabs */}
         <div
+          className="dashboard-tabs"
           style={{
             display: 'flex',
             borderBottom: '1px solid var(--border-subtle)',
             marginBottom: '2rem',
             gap: '0.5rem',
-            overflowX: 'auto'
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none'
           }}
         >
           <button

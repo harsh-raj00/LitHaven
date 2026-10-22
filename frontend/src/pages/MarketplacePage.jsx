@@ -323,11 +323,14 @@ export const MarketplacePage = ({
 
           {/* Quick Subject Filter Chips Strip */}
           <div
+            className="marketplace-quick-chips-row"
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.45rem',
               overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              maxWidth: '100%',
               paddingBottom: '0.4rem',
               scrollbarWidth: 'none'
             }}
@@ -754,7 +757,8 @@ export const MarketplacePage = ({
                       background: 'var(--bg-surface)',
                       border: '1px solid var(--border-subtle)',
                       borderRadius: 'var(--radius-md)',
-                      overflowX: 'auto'
+                      overflowX: 'auto',
+                      WebkitOverflowScrolling: 'touch'
                     }}
                   >
                     <table className="marketplace-table">
