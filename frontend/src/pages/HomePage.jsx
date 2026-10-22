@@ -148,7 +148,7 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
               </h1>
 
               <p className="hero-subtitle">
-                Buy, sell, and share textbooks with fellow students. Discover useful study notes, prepare for exams, and make learning more affordable.
+                Buy, sell, and exchange course textbooks directly with fellow students on campus. Discover student-verified study notes, prepare for exams, and make quality learning more affordable.
               </p>
 
               {/* Integrated Editorial Search Station (Commented out per request)
