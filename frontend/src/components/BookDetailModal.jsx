@@ -145,10 +145,10 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
             </div>
 
             {/* Quick Actions Row */}
-            <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem' }}>
+            <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.2rem', minWidth: 0 }}>
               <button
                 className={`btn btn-secondary ${wishlisted ? 'btn-primary' : ''}`}
-                style={{ flex: 1, borderRadius: 'var(--radius-full)' }}
+                style={{ flex: 1, minWidth: 0, borderRadius: 'var(--radius-full)' }}
                 onClick={handleWishlistToggle}
               >
                 <Heart size={16} fill={wishlisted ? 'currentColor' : 'none'} />
@@ -159,7 +159,7 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
                 className="btn btn-secondary"
                 onClick={handleShare}
                 title="Share Monograph"
-                style={{ borderRadius: 'var(--radius-full)', padding: '0.65rem 0.95rem' }}
+                style={{ borderRadius: 'var(--radius-full)', padding: '0.65rem 0.95rem', flexShrink: 0 }}
               >
                 <Share2 size={16} />
               </button>

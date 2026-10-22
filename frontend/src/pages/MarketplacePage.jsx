@@ -240,7 +240,7 @@ export const MarketplacePage = ({
 
           {/* Search bar row */}
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-            <form onSubmit={handleSearchSubmit} style={{ flex: '1 1 320px', display: 'flex', gap: '0.5rem' }}>
+            <form onSubmit={handleSearchSubmit} className="marketplace-search-form" style={{ flex: '1 1 320px', display: 'flex', gap: '0.5rem' }}>
               <div
                 style={{
                   flex: 1,
@@ -263,6 +263,7 @@ export const MarketplacePage = ({
                   onChange={(e) => setSearch(e.target.value)}
                   style={{
                     flex: 1,
+                    minWidth: 0,
                     border: 'none',
                     background: 'transparent',
                     outline: 'none',
@@ -272,7 +273,7 @@ export const MarketplacePage = ({
                   }}
                 />
                 <span
-                  className="font-mono"
+                  className="font-mono kbd-hint"
                   style={{
                     fontSize: '0.7rem',
                     background: 'var(--bg-secondary)',

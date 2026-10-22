@@ -269,7 +269,7 @@ export const HomePage = ({ setCurrentView, onSelectBook, onInquireBook, setSearc
               </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+            <div className="catalog-controls-row" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap', minWidth: 0, maxWidth: '100%' }}>
               {/* Category Filter Pills (Compact & Refined) */}
               <div
                 className="catalog-tabs-container"
