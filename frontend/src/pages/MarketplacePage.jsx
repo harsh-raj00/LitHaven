@@ -39,6 +39,7 @@ export const MarketplacePage = ({
   const [sortBy, setSortBy] = useState('newest');
   const [viewMode, setViewMode] = useState('grid'); // 'grid', 'list', 'shelf'
   const [categoriesList, setCategoriesList] = useState([]);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Sequence ref to prevent race conditions from out-of-order async responses
   const reqSequenceRef = useRef(0);
@@ -361,6 +362,29 @@ export const MarketplacePage = ({
           </div>
         </div>
 
+        {/* Mobile Filter Toggle Button (< 900px) */}
+        <div className="mobile-filter-toolbar">
+          <button
+            type="button"
+            className="mobile-filter-toggle-btn"
+            onClick={() => setMobileFiltersOpen((prev) => !prev)}
+            aria-expanded={mobileFiltersOpen}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <SlidersHorizontal size={16} />
+              <span>Filter Books</span>
+              {(selectedCategory || selectedCondition || selectedSemester || minPrice || maxPrice) && (
+                <span className="badge badge-accent" style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem' }}>
+                  Active
+                </span>
+              )}
+            </div>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--accent-terracotta)' }}>
+              {mobileFiltersOpen ? 'Hide Filters ▲' : 'Show Filters ▼'}
+            </span>
+          </button>
+        </div>
+
         {/* Main Content Layout: Sidebar Filters + Results */}
         <div
           style={{
@@ -373,6 +397,7 @@ export const MarketplacePage = ({
         >
           {/* Left Sidebar Filters */}
           <aside
+            className={`marketplace-filter-aside ${mobileFiltersOpen ? 'mobile-open' : ''}`}
             style={{
               background: 'var(--bg-surface)',
               border: '1px solid var(--border-subtle)',

@@ -21,7 +21,7 @@ export const Navbar = ({ currentView, setCurrentView }) => {
     try {
       const stored = localStorage.getItem('lithaven_theme');
       if (stored === 'dark' || stored === 'light') return stored;
-    } catch (e) {}
+    } catch (e) { }
     return 'light';
   });
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -31,13 +31,13 @@ export const Navbar = ({ currentView, setCurrentView }) => {
     document.documentElement.setAttribute('data-theme', theme);
     try {
       localStorage.setItem('lithaven_theme', theme);
-    } catch (e) {}
+    } catch (e) { }
   }, [theme]);
 
   // Close mobile drawer on desktop resize & handle Escape
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth > 860) {
+      if (window.innerWidth > 900) {
         setMobileMenuOpen(false);
       }
     };

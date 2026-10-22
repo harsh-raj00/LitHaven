@@ -164,6 +164,7 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
           {/* Form */}
           <form
             onSubmit={handleSubmit}
+            className="create-book-form"
             style={{
               background: 'var(--bg-surface)',
               border: '1px solid var(--border-subtle)',
@@ -192,7 +193,7 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="form-row-dual">
                 <div className="form-group">
                   <label className="form-label">Author(s) *</label>
                   <input
@@ -219,7 +220,7 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="form-row-dual">
                 <div className="form-group">
                   <label className="form-label">Course Code (Optional)</label>
                   <input
@@ -314,7 +315,7 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
                 <label className="form-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
                   Or select an authentic edition photo:
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <div className="create-preset-grid">
                   {presets.map((preset, idx) => (
                     <div
                       key={idx}
@@ -350,7 +351,7 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>Price (₹)</h3>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="form-row-dual">
                 <div className="form-group">
                   <label className="form-label">Selling Price (₹) *</label>
                   <input
@@ -437,7 +438,7 @@ export const CreateBookPage = ({ setCurrentView, onSelectBook }) => {
           </form>
 
           {/* Right Column: Live Card Preview */}
-          <div style={{ position: 'sticky', top: 'calc(var(--nav-height) + 1.5rem)' }}>
+          <div className="create-preview-wrap">
             <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.5rem' }}>
               Preview
             </div>

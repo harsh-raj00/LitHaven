@@ -437,6 +437,7 @@ export const ResourceCard = ({ resource }) => {
 
             {/* Contributor Persona & Specifications Grid */}
             <div
+              className="resource-contributor-grid"
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',

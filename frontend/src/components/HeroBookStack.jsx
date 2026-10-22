@@ -127,8 +127,8 @@ export const HeroBookStack = ({ setCurrentView }) => {
           className={`hero-floating-pivot ${prefersReducedMotion ? 'reduced-motion' : ''}`}
           style={{
             transform: prefersReducedMotion
-              ? 'rotateX(8deg) rotateY(-6deg)'
-              : `rotateX(${9 + tilt.x}deg) rotateY(${-10 + tilt.y}deg)`
+              ? 'scale(var(--hero-stack-scale, 1)) rotateX(8deg) rotateY(-6deg)'
+              : `scale(var(--hero-stack-scale, 1)) rotateX(${9 + tilt.x}deg) rotateY(${-10 + tilt.y}deg)`
           }}
         >
           {/* =========================================================

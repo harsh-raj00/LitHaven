@@ -79,16 +79,7 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="modal-content"
-        style={{
-          maxWidth: '880px',
-          padding: '2.5rem',
-          borderRadius: 'var(--radius-xl)',
-          border: '1px solid var(--border-medium)',
-          boxShadow: 'var(--shadow-lg)',
-          background: 'var(--bg-surface)',
-          color: 'var(--text-primary)'
-        }}
+        className="modal-content book-detail-modal-content"
         onClick={(e) => e.stopPropagation()}
       >
         <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
@@ -106,18 +97,7 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
         >
           {/* Left Column: 3D Hardcover Cover & Provenance Stamp */}
           <div>
-            <div
-              style={{
-                width: '100%',
-                height: '420px',
-                borderRadius: '8px 16px 16px 8px',
-                overflow: 'hidden',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-subtle)',
-                position: 'relative',
-                boxShadow: 'var(--shadow-book)'
-              }}
-            >
+            <div className="book-detail-cover-box">
               {/* 3D Spine gleam */}
               <div
                 style={{
@@ -211,6 +191,7 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
 
             {/* Price Box with Savings Engine */}
             <div
+              className="book-detail-price-box"
               style={{
                 display: 'flex',
                 alignItems: 'baseline',
@@ -246,7 +227,7 @@ export const BookDetailModal = ({ book, onClose, onMakeOffer }) => {
               <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '0.6rem' }}>
                 Physical Provenance & Notation Rubric
               </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', fontSize: '0.85rem' }}>
+              <div className="book-detail-provenance-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', fontSize: '0.85rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)' }}>
                   <CheckCircle size={14} color="var(--savings-green)" /> Spine Binding: Firm & Intact
                 </div>

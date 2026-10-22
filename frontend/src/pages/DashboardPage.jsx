@@ -493,7 +493,7 @@ export const DashboardPage = ({ setCurrentView, onSelectBook, onInquireBook }) =
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '0.75rem' }}>
+              <div className="dashboard-dept-year-row">
                 <div className="form-group">
                   <label className="form-label">Department / Major</label>
                   <input

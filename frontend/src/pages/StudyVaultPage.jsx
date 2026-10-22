@@ -401,7 +401,7 @@ export const StudyVaultPage = () => {
             </button>
 
             <div style={{ fontSize: '0.72rem', color: 'var(--accent-terracotta)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'var(--font-mono)', marginBottom: '0.25rem' }}>
-               SCHOLAR CONTRIBUTION 
+              SCHOLAR CONTRIBUTION
             </div>
 
             <h2 style={{ fontSize: '1.45rem', fontWeight: 700, marginBottom: '0.25rem' }}>
